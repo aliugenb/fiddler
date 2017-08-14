@@ -120,7 +120,11 @@ class Handlers
 	RulesStringValue(24,"Kindle Fire (Silk)", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_3; en-us; Silk/1.0.22.79_10013310) AppleWebKit/533.16 (KHTML, like Gecko) Version/5.0 Safari/533.16 Silk-Accelerated=true")
 	RulesStringValue(25,"&Custom...", "%CUSTOM%")
 	public static var sUA: String = null;
-	
+
+	RulesString("Custom Response",true)
+	RulesStringValue(0,"打开", "1")
+	public static var custom_response: String = null;
+
 	RulesString("SwitchHosts",true)
 	RulesStringValue(0,"外测", "waice")
 	RulesStringValue(1,"158", "158")
@@ -365,7 +369,6 @@ class Handlers
         var re3 = /(\d+\.){3}\d+(\s+(\w+\.){1,2}(fanli|51fanli|shzyfl)\.(com|net|cn))+/ig;//匹配出每个ip+host
         while (!f.AtEndOfStream){
             var read_hosts =f.readline();
-			FiddlerObject.log(read_hosts);
             if (re1.test(read_hosts) || /^\r+$/.test(read_hosts)){
                 continue;
             }
@@ -628,30 +631,25 @@ class Handlers
 	//		oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Funion-click.jd.com%2Fjdc%3Fe%3DD00pk9ey4mqy3ghgv8s2%26p%3DAyIOZRJSFwARAlwdXyUCEAVUH1sTBRUBXCsfSlpMWGVCHlBDUAxLBQcKWUcYB0UHC0NRWQBfCVAcEgVXGl8VBBUAUxJETEdOWmVYJ295Gn5WHD5ddHpdM2czXll7RgBdVxlsEQZVHUcUBQ4EVgpbHAkSA14bWCUBEQZRGFgVBhc3VxxSEQQiB2UbWiVDfABVGlwXACIGZRteHQsSBFIfWxYCFw5lHGtOV3wDBh8JEVYbU1JIWRZWIjdlKw%253D%253D%26t%3DW1dCFFlQCxxOGA5OREdcThkUWAVARkBCSxtZFwMWB1McXBMLDV4QRwY%253D%26tracking_id%3D7527146284';
 	//	}
 		
-        var isMyRequest = false;
-		//	if (oSession.fullUrl.Contains("v2/shop/getFanliRule")) {
-		//	var isMyRequest = true;
-		//	}
+        if (custom_response){
+			// if (oSession.fullUrl.Contains("key=popmsg")) {
+            // if (oSession.fullUrl.Contains("fun.fanli.com/api/taobao/searchTaobao")) {
+            if (oSession.fullUrl.Contains("api.v1.search&keyword")) {
+                FiddlerObject.log('enter');
+			    // 获取Response Body中JSON字符串
+			    var responseStringOriginal =  oSession.GetResponseBodyAsString();
 
-		if (isMyRequest) {
-			// 获取Response Body中JSON字符串
-			var responseStringOriginal =  oSession.GetResponseBodyAsString();
-			
-            // 可在控制台中输出Log
-			//FiddlerObject.log(responseStringOriginal);  
-			//FiddlerObject.alert(responseStringOriginal);
-			
-			//转换为可编辑的JSONObject变量
-			var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+			    //转换为可编辑的JSONObject变量
+			    var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+                responseJSON.JSONObject['data']['list_state']= Fiddler.WebFormats.JSON.JsonDecode('1').JSONObject;
+	    		// responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*100)+1)).JSONObject.toString();
+			    // responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*1000)+1)).JSONObject;
 
-			var pid = parseInt(responseJSON.JSONObject['data']['pid'])+1;
-			//FiddlerObject.log(pid);
-			responseJSON.JSONObject['data']['pid'] = Fiddler.WebFormats.JSON.JsonDecode(pid).JSONObject;
-			
-			//重新设置Response Body
-			var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
-			oSession.utilSetResponseBody(responseStringDestinal);
-		}
+			    //重新设置Response Body
+			    var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+			    oSession.utilSetResponseBody(responseStringDestinal);
+		    }
+        }
 		
 		
         if (oSession.host.Contains("fanli")) {
