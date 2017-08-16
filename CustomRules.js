@@ -661,6 +661,21 @@ class Handlers
                     fanliSwitch = fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
                 }
             }
+            if (webview) {
+                if (oSession.fullUrl.Contains("src=2")){
+                    if (/^\{.*browser_type.*\}$/.test(fanliSwitch)){
+                        fanliSwitch = fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1");
+                    }else {
+                        fanliSwitch = fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
+                    }
+                }else if (oSession.fullUrl.Contains("src=1")){
+                    if (/^\{.*force_uiwv.*\}$/.test(fanliSwitch)){
+                        fanliSwitch = fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":1");
+                    }else {
+                        fanliSwitch = fanliSwitch.replace(/\}$/, ",\"force_uiwv\":1}");
+                    }
+                }
+            }
             responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
             oSession.utilSetResponseBody(responseStringDestinal);
