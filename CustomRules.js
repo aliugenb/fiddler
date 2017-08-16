@@ -125,6 +125,12 @@ class Handlers
 	RulesStringValue(0,"打开", "1")
 	public static var custom_response: String = null;
 
+	public static RulesOption("xwalk", "切换浏览器内核")
+	var xwalk: boolean = false;
+
+	public static RulesOption("webkit", "切换浏览器内核")
+	var webkit: boolean = false;
+
 	RulesString("SwitchHosts",true)
 	RulesStringValue(0,"外测", "waice")
 	RulesStringValue(1,"158", "158")
@@ -416,6 +422,10 @@ class Handlers
         return false;
     }
 
+    static function CustomResponse(){
+        return;
+    }
+
     static function OnBeforeRequest(oSession: Session) {
         // Sample Rule: Color ASPX requests in RED
      //   if (oSession.responseCode == 404){
@@ -447,7 +457,7 @@ class Handlers
                 mark_txt.close();
             }
         }
-		
+
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
             var path = "Hosts\\"+m_host+".hosts";
             var hosts = GetHosts(path);
@@ -630,18 +640,45 @@ class Handlers
 	//	if (oSession.fullUrl.Contains("fun.fanli.com/goshop/go")){
 	//		oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Funion-click.jd.com%2Fjdc%3Fe%3DD00pk9ey4mqy3ghgv8s2%26p%3DAyIOZRJSFwARAlwdXyUCEAVUH1sTBRUBXCsfSlpMWGVCHlBDUAxLBQcKWUcYB0UHC0NRWQBfCVAcEgVXGl8VBBUAUxJETEdOWmVYJ295Gn5WHD5ddHpdM2czXll7RgBdVxlsEQZVHUcUBQ4EVgpbHAkSA14bWCUBEQZRGFgVBhc3VxxSEQQiB2UbWiVDfABVGlwXACIGZRteHQsSBFIfWxYCFw5lHGtOV3wDBh8JEVYbU1JIWRZWIjdlKw%253D%253D%26t%3DW1dCFFlQCxxOGA5OREdcThkUWAVARkBCSxtZFwMWB1McXBMLDV4QRwY%253D%26tracking_id%3D7527146284';
 	//	}
-		
+
+        if (/^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*&key=common&.*$/.test(oSession.fullUrl)){
+            var responseStringOriginal =  oSession.GetResponseBodyAsString();
+            var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+            var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+            if ((xwalk) && (oSession.fullUrl.Contains("src=2"))){
+                if (/^\{.*browser_type.*\}$/.test(fanliSwitch)){
+                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2");
+                }else {
+                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
+                }
+                FiddlerObject.StatusText="已切换到xwalk";
+            }else if ((webkit) && (oSession.fullUrl.Contains("src=1"))){
+                if (/^\{.*force_uiwv.*\}$/.test(fanliSwitch)){
+                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2");
+                }else {
+                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
+                }
+                FiddlerObject.StatusText="已切换到webkit";
+            }
+            var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+            oSession.utilSetResponseBody(responseStringDestinal);
+        }
+
         if (custom_response){
 			// if (oSession.fullUrl.Contains("key=popmsg")) {
             // if (oSession.fullUrl.Contains("fun.fanli.com/api/taobao/searchTaobao")) {
-            if (oSession.fullUrl.Contains("api.v1.search&keyword")) {
+            //if (oSession.fullUrl.Contains("api.v1.search&keyword")) {
+            if (oSession.fullUrl.Contains("mobile/getResource")) {
                 FiddlerObject.log('enter');
 			    // 获取Response Body中JSON字符串
 			    var responseStringOriginal =  oSession.GetResponseBodyAsString();
 
 			    //转换为可编辑的JSONObject变量
 			    var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-                responseJSON.JSONObject['data']['list_state']= Fiddler.WebFormats.JSON.JsonDecode('1').JSONObject;
+                var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+                FiddlerObject.log(fanliSwitch);
+                // responseJSON.JSONObject['data']['list_state']= Fiddler.WebFormats.JSON.JsonDecode('1').JSONObject;
+                //responseJSON.JSONObject['data']['sug_pos_index']= Fiddler.WebFormats.JSON.JsonDecode('0').JSONObject;
 	    		// responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*100)+1)).JSONObject.toString();
 			    // responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*1000)+1)).JSONObject;
 
@@ -883,13 +920,3 @@ class Handlers
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
