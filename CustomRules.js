@@ -641,27 +641,41 @@ class Handlers
 	//		oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Funion-click.jd.com%2Fjdc%3Fe%3DD00pk9ey4mqy3ghgv8s2%26p%3DAyIOZRJSFwARAlwdXyUCEAVUH1sTBRUBXCsfSlpMWGVCHlBDUAxLBQcKWUcYB0UHC0NRWQBfCVAcEgVXGl8VBBUAUxJETEdOWmVYJ295Gn5WHD5ddHpdM2czXll7RgBdVxlsEQZVHUcUBQ4EVgpbHAkSA14bWCUBEQZRGFgVBhc3VxxSEQQiB2UbWiVDfABVGlwXACIGZRteHQsSBFIfWxYCFw5lHGtOV3wDBh8JEVYbU1JIWRZWIjdlKw%253D%253D%26t%3DW1dCFFlQCxxOGA5OREdcThkUWAVARkBCSxtZFwMWB1McXBMLDV4QRwY%253D%26tracking_id%3D7527146284';
 	//	}
 
-        if (/^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*&key=common&.*$/.test(oSession.fullUrl)){
+        if (/^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
             if ((xwalk) && (oSession.fullUrl.Contains("src=2"))){
                 if (/^\{.*browser_type.*\}$/.test(fanliSwitch)){
-                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2");
+                    fanliSwitch = fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2");
                 }else {
-                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
+                    fanliSwitch = fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
                 }
-                FiddlerObject.StatusText="已切换到xwalk";
             }else if ((webkit) && (oSession.fullUrl.Contains("src=1"))){
                 if (/^\{.*force_uiwv.*\}$/.test(fanliSwitch)){
-                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2");
+                    fanliSwitch = fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2");
                 }else {
-                    responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
+                    fanliSwitch = fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
                 }
-                FiddlerObject.StatusText="已切换到webkit";
             }
+            responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
             oSession.utilSetResponseBody(responseStringDestinal);
+
+            if (oSession.fullUrl.Contains("src=1")){
+                if (/^\{.*\"force_uiwv\":2.*\}$/.test(fanliSwitch)){
+                    FiddlerObject.StatusText="当前使用webkit";
+                }else {
+                    FiddlerObject.StatusText="当前使用webview";
+                }
+            }
+            if (oSession.fullUrl.Contains("src=2")){
+                if (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch)){
+                    FiddlerObject.StatusText="当前使用xwalk";
+                }else {
+                    FiddlerObject.StatusText="当前使用webview";
+                }
+            }
         }
 
         if (custom_response){
