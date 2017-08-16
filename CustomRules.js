@@ -125,11 +125,14 @@ class Handlers
 	RulesStringValue(0,"打开", "1")
 	public static var custom_response: String = null;
 
-	public static RulesOption("xwalk", "切换浏览器内核")
+	public static RulesOption("Android切换xwalk", "切换浏览器内核")
 	var xwalk: boolean = false;
 
-	public static RulesOption("webkit", "切换浏览器内核")
+	public static RulesOption("ios切换webkit", "切换浏览器内核")
 	var webkit: boolean = false;
+
+    public static RulesOption("切换webview", "切换浏览器内核")
+	var webview: boolean = false;
 
 	RulesString("SwitchHosts",true)
 	RulesStringValue(0,"外测", "waice")
