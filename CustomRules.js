@@ -649,50 +649,25 @@ class Handlers
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
             if ((xwalk) && (oSession.fullUrl.Contains("src=2"))){
-                if (/^\{.*browser_type.*\}$/.test(fanliSwitch)){
-                    fanliSwitch = fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2");
-                }else {
-                    fanliSwitch = fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
-                }
+                fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
             }else if ((webkit) && (oSession.fullUrl.Contains("src=1"))){
-                if (/^\{.*force_uiwv.*\}$/.test(fanliSwitch)){
-                    fanliSwitch = fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2");
-                }else {
-                    fanliSwitch = fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
-                }
+                fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
             }
             if (webview) {
                 if (oSession.fullUrl.Contains("src=2")){
-                    if (/^\{.*browser_type.*\}$/.test(fanliSwitch)){
-                        fanliSwitch = fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1");
-                    }else {
-                        fanliSwitch = fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
-                    }
+                    fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
                 }else if (oSession.fullUrl.Contains("src=1")){
-                    if (/^\{.*force_uiwv.*\}$/.test(fanliSwitch)){
-                        fanliSwitch = fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":1");
-                    }else {
-                        fanliSwitch = fanliSwitch.replace(/\}$/, ",\"force_uiwv\":1}");
-                    }
+                    fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":1"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":1}");
                 }
             }
             responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
             oSession.utilSetResponseBody(responseStringDestinal);
-
             if (oSession.fullUrl.Contains("src=1")){
-                if (/^\{.*\"force_uiwv\":2.*\}$/.test(fanliSwitch)){
-                    FiddlerObject.StatusText="当前使用webkit";
-                }else {
-                    FiddlerObject.StatusText="当前使用webview";
-                }
+                (/^\{.*\"force_uiwv\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用webkit":FiddlerObject.StatusText="当前使用webview";
             }
             if (oSession.fullUrl.Contains("src=2")){
-                if (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch)){
-                    FiddlerObject.StatusText="当前使用xwalk";
-                }else {
-                    FiddlerObject.StatusText="当前使用webview";
-                }
+                (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用xwalk":FiddlerObject.StatusText="当前使用webview";
             }
         }
 
