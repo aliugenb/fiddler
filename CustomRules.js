@@ -643,30 +643,19 @@ class Handlers
 	//	if (oSession.fullUrl.Contains("fun.fanli.com/goshop/go")){
 	//		oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Funion-click.jd.com%2Fjdc%3Fe%3DD00pk9ey4mqy3ghgv8s2%26p%3DAyIOZRJSFwARAlwdXyUCEAVUH1sTBRUBXCsfSlpMWGVCHlBDUAxLBQcKWUcYB0UHC0NRWQBfCVAcEgVXGl8VBBUAUxJETEdOWmVYJ295Gn5WHD5ddHpdM2czXll7RgBdVxlsEQZVHUcUBQ4EVgpbHAkSA14bWCUBEQZRGFgVBhc3VxxSEQQiB2UbWiVDfABVGlwXACIGZRteHQsSBFIfWxYCFw5lHGtOV3wDBh8JEVYbU1JIWRZWIjdlKw%253D%253D%26t%3DW1dCFFlQCxxOGA5OREdcThkUWAVARkBCSxtZFwMWB1McXBMLDV4QRwY%253D%26tracking_id%3D7527146284';
 	//	}
-/*
-vivo X7
 
-vivo X6S A
-
-
-
-Fanli/6.1.0.36 (vivo vivo X7; Android 5.1.1; zh_CN; ID:2-42935722-61806941067567-24-0; SCR:1080*1920-3.0)
-
-
-
- "browser_rule": {
-      "content": "{\"shops\":[\"712\"],\"urls\":\"{\\\"m.api.51fanli.com\\\\\\/app\\\\\\/item.htm\\\":[\\\"[\\\\\\\\?|&]{1}id=(\\\\\\\\d+)\\\"],\\\"m.api.fanli.com\\\\\\/app\\\\\\/item.htm\\\":[\\\"[\\\\\\\\?|&]{1}id=(\\\\\\\\d+)\\\"]}\",\"device_white_list\":[\"SM801\"]}",
-      "updatetime": "1483432533"
-    },
-
- */
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+            if (!responseJSON.JSONObject['data']['switch']){
+                MessageBox.Show("接口出错啦，switch都没了！！");
+            }
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-            var devices = new Array();
+            var browser_rule = responseJSON.JSONObject['data']['browser_rule']?responseJSON.JSONObject['data']['browser_rule']['content']:null;
+            regex = /(?<=device_white_list\\\":\[\\\")[\w|\d]+(?=\\)/;
+
             if ((xwalk) && (oSession.fullUrl.Contains("src=2"))){
-                var devices = new Array();
+                var devices = new Array('VTR-AL00', 'vivo X7', 'vivo X6S A');
                 fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
             }else if ((webkit) && (oSession.fullUrl.Contains("src=1"))){
                 fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
