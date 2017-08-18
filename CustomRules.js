@@ -648,27 +648,25 @@ class Handlers
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
             if (!responseJSON.JSONObject['data'].ContainsKey('switch')){
-                MessageBox.Show("接口出错啦，switch都没了！！");
+                MessageBox.Show("接口出错啦，switch都没了！！！");
             }
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
 
             //Android内置默认白名单
             var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
             //当前请求的设备
-            var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
-            FiddlerObject.log(inArray(white_devices, device));
-
+            var device: String = null;
             if ((xwalk) && (oSession.fullUrl.Contains("src=2"))){
-                if (inArray(white_devices, device)){
-                    FiddlerObject.log('enter');
-                    fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
-                }else {
-                    var updatime = new System.Collections.Hashtable();
-                    updatime.Add('updatime', ""+new Date().getTime()+"");
-                    responseJSON.JSONObject['data'].Add('browser_rule',updatime);
+                device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
+                FiddlerObject.log(inArray(white_devices, device));
+                if (!inArray(white_devices, device)){
+                    var updatetime = new System.Collections.Hashtable();
+                    updatetime.Add('updatetime', ""+new Date().getTime()+"");
+                    responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
                     var content = "{\"device_white_list\":[\""+device+"\"]}";
                     responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
                 }
+                fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
             }else if ((webkit) && (oSession.fullUrl.Contains("src=1"))){
                 fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
             }
