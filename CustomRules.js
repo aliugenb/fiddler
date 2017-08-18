@@ -647,16 +647,28 @@ class Handlers
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-            if (!responseJSON.JSONObject['data']['switch']){
+            if (!responseJSON.JSONObject['data'].ContainsKey('switch')){
                 MessageBox.Show("接口出错啦，switch都没了！！");
             }
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-            var browser_rule = responseJSON.JSONObject['data']['browser_rule']?responseJSON.JSONObject['data']['browser_rule']['content']:null;
-            regex = /(?<=device_white_list\\\":\[\\\")[\w|\d]+(?=\\)/;
+
+            //Android内置默认白名单
+            var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
+            //当前请求的设备
+            var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
+            FiddlerObject.log(inArray(white_devices, device));
 
             if ((xwalk) && (oSession.fullUrl.Contains("src=2"))){
-                var devices = new Array('VTR-AL00', 'vivo X7', 'vivo X6S A');
-                fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
+                if (inArray(white_devices, device)){
+                    FiddlerObject.log('enter');
+                    fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
+                }else {
+                    var updatime = new System.Collections.Hashtable();
+                    updatime.Add('updatime', ""+new Date().getTime()+"");
+                    responseJSON.JSONObject['data'].Add('browser_rule',updatime);
+                    var content = "{\"device_white_list\":[\""+device+"\"]}";
+                    responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
+                }
             }else if ((webkit) && (oSession.fullUrl.Contains("src=1"))){
                 fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
             }
