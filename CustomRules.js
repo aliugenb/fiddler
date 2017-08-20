@@ -651,49 +651,44 @@ class Handlers
                 MessageBox.Show("接口出错啦，switch都没了！！！");
             }
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-
-            //Android内置默认白名单
-            var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
-            //当前请求的设备
-            var device: String = null;
-            //接口返回browser_rule节点内容
-            var content: String = null;
-            if ((xwalk) && (oSession.fullUrl.Contains("src=2"))){
-                device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
-                FiddlerObject.log(inArray(white_devices, device));
-                if (!inArray(white_devices, device)){
-                    var updatetime = new System.Collections.Hashtable();
-                    updatetime.Add('updatetime', ""+new Date().getTime()+"");
-                    responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
-                    content = "{\"device_white_list\":[\""+device+"\"]}";
-                    responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
+            if (oSession.fullUrl.Contains("src=2")){
+                //Android内置默认白名单
+                var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
+                //当前请求的设备
+                var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
+                //接口返回browser_rule节点内容
+                var content: String = null;
+                if (!webview && xwalk){
+                    if (!inArray(white_devices, device)){
+                        var updatetime = new System.Collections.Hashtable();
+                        updatetime.Add('updatetime', ""+new Date().getTime()+"");
+                        responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
+                        content = "{\"device_white_list\":[\""+device+"\"]}";
+                        responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
+                    }
+                    fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
                 }
-                fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
-            }else if ((webkit) && (oSession.fullUrl.Contains("src=1"))){
-                fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
-            }
-            if (webview) {
-                if (oSession.fullUrl.Contains("src=2")){
+                if (webview){
+                    responseJSON.JSONObject['data'].Remove('browser_rule');
                     fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
-                }else if (oSession.fullUrl.Contains("src=1")){
+                }
+                if(inArray(white_devices, device)){
+                    (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用xwalk":FiddlerObject.StatusText="当前使用webview";
+                } else{
+                    (!webview && content.search(device)!= -1 && (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch)))?FiddlerObject.StatusText="当前使用xwalk":FiddlerObject.StatusText="当前使用webview";
+                }
+            } else if (oSession.fullUrl.Contains("src=1")){
+                if (!webview && webkit){
+                    fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
+                }
+                if (webview){
                     fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":1"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":1}");
                 }
+                (/^\{.*\"force_uiwv\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用webkit":FiddlerObject.StatusText="当前使用webview";
             }
             responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
             oSession.utilSetResponseBody(responseStringDestinal);
-            if (oSession.fullUrl.Contains("src=1")){
-                (/^\{.*\"force_uiwv\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用webkit":FiddlerObject.StatusText="当前使用webview";
-            }
-            if (oSession.fullUrl.Contains("src=2")){
-                device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
-                FiddlerObject.log(content.search(device));
-                if(inArray(white_devices, device)){
-                    (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用xwalk":FiddlerObject.StatusText="当前使用webview";
-                } else{
-                    ((/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch)) && content.search(device)!= -1)?FiddlerObject.StatusText="当前使用xwalk":FiddlerObject.StatusText="当前使用webview";
-                }
-            }
         }
 
         if (custom_response){
