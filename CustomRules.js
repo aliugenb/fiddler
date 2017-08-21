@@ -125,14 +125,14 @@ class Handlers
 	RulesStringValue(0,"打开", "1")
 	public static var custom_response: String = null;
 
-	public static RulesOption("Android切换xwalk", "切换浏览器内核")
+	public static RulesOption("切换xwalk", "切换浏览器内核")
 	var xwalk: boolean = false;
 
-	public static RulesOption("ios切换webkit", "切换浏览器内核")
+	public static RulesOption("切换webkit", "切换浏览器内核")
 	var webkit: boolean = false;
 
-    public static RulesOption("切换webview", "切换浏览器内核")
-	var webview: boolean = false;
+    public static RulesOption("恢复uiwebview", "切换浏览器内核")
+	var uiwebview: boolean = false;
 
 	RulesString("SwitchHosts",true)
 	RulesStringValue(0,"外测", "waice")
@@ -647,44 +647,44 @@ class Handlers
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-            if (!responseJSON.JSONObject['data'].ContainsKey('switch')){
-                MessageBox.Show("接口出错啦，switch都没了！！！");
+            if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')){
+                MessageBox.Show("接口出错啦！！！");
+                return;
             }
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
             if (oSession.fullUrl.Contains("src=2")){
                 //Android内置默认白名单
-                var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
+                // var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
                 //当前请求的设备
                 var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
-                //接口返回browser_rule节点内容
-                var content: String = null;
-                if (!webview && xwalk){
-                    if (!inArray(white_devices, device)){
-                        var updatetime = new System.Collections.Hashtable();
-                        updatetime.Add('updatetime', ""+new Date().getTime()+"");
-                        responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
-                        content = "{\"device_white_list\":[\""+device+"\"]}";
-                        responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
-                    }
+                //接口未返回browser_rule节点时，写入默认内容
+                var content = "{}";
+                var updatetime = new System.Collections.Hashtable();
+                if (!responseJSON.JSONObject['data'].ContainsKey('browser_rule')){
+                    updatetime.Add('updatetime', ""+new Date().getTime()+"");
+                    responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
+                    responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
+                }
+                if (!uiwebview && xwalk){
+                    content = "{\"device_white_list\":[\""+device+"\"]}";
+                    responseJSON.JSONObject['data']['browser_rule']['content']=content;
                     fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
+                    FiddlerObject.StatusText="已切换至xwalk";
                 }
-                if (webview){
-                    responseJSON.JSONObject['data'].Remove('browser_rule');
-                    fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
-                }
-                if(inArray(white_devices, device)){
-                    (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用xwalk":FiddlerObject.StatusText="当前使用webview";
-                } else{
-                    (!webview && content.search(device)!= -1 && (/^\{.*\"browser_type\":2.*\}$/.test(fanliSwitch)))?FiddlerObject.StatusText="当前使用xwalk":FiddlerObject.StatusText="当前使用webview";
+                if (uiwebview){
+                    content = "{\"device_white_list\":[\"\"]}";
+                    responseJSON.JSONObject['data']['browser_rule']['content']=content;
+                    FiddlerObject.StatusText="已切换至uiwebview";
+                    // fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
                 }
             } else if (oSession.fullUrl.Contains("src=1")){
-                if (!webview && webkit){
+                if (!uiwebview && webkit){
                     fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
                 }
-                if (webview){
+                if (uiwebview){
                     fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":1"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":1}");
                 }
-                (/^\{.*\"force_uiwv\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="当前使用webkit":FiddlerObject.StatusText="当前使用webview";
+                (/^\{.*\"force_uiwv\":2.*\}$/.test(fanliSwitch))?FiddlerObject.StatusText="已切换至webkit":FiddlerObject.StatusText="已切换至uiwebview";
             }
             responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
@@ -754,7 +754,7 @@ class Handlers
     static function OnDone(oSession: Session) {
     }
 */
-
+/*
     public static var hosts_env = new  Array('waice','158','custom','shengchan');
     static function OnBoot() {
 
@@ -765,7 +765,7 @@ class Handlers
         // UI.ActivateResponseInspector("HEADERS");
     }
 
-
+*/
     /*
     static function OnBeforeShutdown(): Boolean {
         // Return false to cancel shutdown.
