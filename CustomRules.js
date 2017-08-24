@@ -163,7 +163,7 @@ class Handlers
         if (m_host){
             hosts = "hosts\\"+m_host+".hosts";
         }
-        System.Diagnostics.Process.Start("D:\\Program Files\\Notepad++\\notepad++.exe", hosts);
+        System.Diagnostics.Process.Start("D:\\Program Files\\Sublime Text 3\\sublime_text.exe", hosts);
     }
 
     
