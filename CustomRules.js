@@ -140,7 +140,11 @@ class Handlers
     RulesStringValue(2,"生产", "shengchan")
 	RulesStringValue(3,"自定义", "custom")
 	public static var m_host: String = null;	
-	
+
+	RulesString("添加分流",true)
+	RulesStringValue(0,'Custom', '%custom%')
+	public static var m_abtest: String = null;
+
 	public static RulesOption("图片是否绑定生产", "SwitchHosts")
 	var m_image: boolean = false;
 
@@ -695,15 +699,15 @@ class Handlers
 			// if (oSession.fullUrl.Contains("key=popmsg")) {
             // if (oSession.fullUrl.Contains("fun.fanli.com/api/taobao/searchTaobao")) {
             //if (oSession.fullUrl.Contains("api.v1.search&keyword")) {
-            if (oSession.fullUrl.Contains("mobile/getResource")) {
+            if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)) {
                 FiddlerObject.log('enter');
 			    // 获取Response Body中JSON字符串
 			    var responseStringOriginal =  oSession.GetResponseBodyAsString();
 
 			    //转换为可编辑的JSONObject变量
 			    var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-                var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-                FiddlerObject.log(fanliSwitch);
+                var custom = responseJSON.JSONObject['data']['genaral']['content'];
+                FiddlerObject.log(custom);
                 // responseJSON.JSONObject['data']['list_state']= Fiddler.WebFormats.JSON.JsonDecode('1').JSONObject;
                 //responseJSON.JSONObject['data']['sug_pos_index']= Fiddler.WebFormats.JSON.JsonDecode('0').JSONObject;
 	    		// responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*100)+1)).JSONObject.toString();
