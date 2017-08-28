@@ -141,7 +141,7 @@ class Handlers
 	RulesStringValue(3,"自定义", "custom")
 	public static var m_host: String = null;	
 
-	RulesString("添加分流",true)
+	RulesString("自定义分流",true)
 	RulesStringValue(0,'Custom', '%custom%')
 	public static var m_abtest: String = null;
 
@@ -354,7 +354,7 @@ class Handlers
             + seperator2 + date.getSeconds();
         return curTime;
     }
-   
+
     static function createFolder(){
         //文件保存路径，可自定义
      	var parFolder = "D:\\Fiddler Sessions";
