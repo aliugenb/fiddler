@@ -138,7 +138,8 @@ class Handlers
 	RulesStringValue(0,"外测", "waice")
 	RulesStringValue(1,"158", "158")
     RulesStringValue(2,"生产", "shengchan")
-	RulesStringValue(3,"自定义", "custom")
+	RulesStringValue(3,"custom外测", "custom-waice")
+	RulesStringValue(3,"custom内测", "custom-neice")
 	public static var m_host: String = null;	
 
 	RulesString("自定义分流",true)
@@ -519,11 +520,11 @@ class Handlers
             oSession["ui-bold"]="QuickExec";
         }
 
-        if (m_SimulateModem) {
+        if ((m_SimulateModem)&&(oSession.fullUrl.Contains("v2/shop/getFanliRule"))) {
             // Delay sends by 300ms per KB uploaded.
-            oSession["request-trickle-delay"] = "300000"; 
+            oSession["request-trickle-delay"] = "3"; 
             // Delay receives by 150ms per KB downloaded.
-            oSession["response-trickle-delay"] = "1000"; 
+            oSession["response-trickle-delay"] = "1770"; 
         }
 
         if (m_DisableCaching) {
@@ -558,11 +559,11 @@ class Handlers
             oSession["ui-backcolor"] = "Lavender";
         }
         
-        if (oSession.host.Contains("fanli")){
-            if(oSession.oRequest.headers.Exists("If-None-Match")){
-                oSession.oRequest["If-None-Match"] = 'not304';
-            }
-        } 
+        // if (oSession.host.Contains("fanli")){
+        //     if(oSession.oRequest.headers.Exists("If-None-Match")){
+        //         oSession.oRequest["If-None-Match"] = 'not304';
+        //     }
+        // }
      
         if (oSession.host.Contains("fanli")){
             if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
@@ -644,14 +645,14 @@ class Handlers
             oSession["ui-hide"] = "true";
         }
 		
-	//	if (oSession.fullUrl.Contains("fun.fanli.com/goshop/go")){
-	//		oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Funion-click.jd.com%2Fjdc%3Fe%3DD00pk9ey4mqy3ghgv8s2%26p%3DAyIOZRJSFwARAlwdXyUCEAVUH1sTBRUBXCsfSlpMWGVCHlBDUAxLBQcKWUcYB0UHC0NRWQBfCVAcEgVXGl8VBBUAUxJETEdOWmVYJ295Gn5WHD5ddHpdM2czXll7RgBdVxlsEQZVHUcUBQ4EVgpbHAkSA14bWCUBEQZRGFgVBhc3VxxSEQQiB2UbWiVDfABVGlwXACIGZRteHQsSBFIfWxYCFw5lHGtOV3wDBh8JEVYbU1JIWRZWIjdlKw%253D%253D%26t%3DW1dCFFlQCxxOGA5OREdcThkUWAVARkBCSxtZFwMWB1McXBMLDV4QRwY%253D%26tracking_id%3D7527146284';
-	//	}
+//		if (oSession.fullUrl.Contains("http://fun.fanli.com/goshop/go")){
+//			oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F12881516028.html;s_id=544';
+//	}
 
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-            if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')){
+            if ((!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) && oSession.responseCode != 304){
                 MessageBox.Show("接口出错啦！！！");
                 return;
             }
@@ -699,15 +700,18 @@ class Handlers
 			// if (oSession.fullUrl.Contains("key=popmsg")) {
             // if (oSession.fullUrl.Contains("fun.fanli.com/api/taobao/searchTaobao")) {
             //if (oSession.fullUrl.Contains("api.v1.search&keyword")) {
-            if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)) {
-                FiddlerObject.log('enter');
+            if (oSession.fullUrl.Contains('fun.fanli.com/goshop/go')) {
+                FiddlerObject.log('enter custom');
 			    // 获取Response Body中JSON字符串
 			    var responseStringOriginal =  oSession.GetResponseBodyAsString();
-
+				FiddlerObject.log(responseStringOriginal);
 			    //转换为可编辑的JSONObject变量
 			    var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
                 var custom = responseJSON.JSONObject['data']['genaral']['content'];
                 FiddlerObject.log(custom);
+				//custom = custom.replace(/"load_duration":(\d+)/,"\"load_duration\":10");
+				custom = custom.replace(/"ota":\[.*\]/, "\"ota\":\[544\]");
+				responseJSON.JSONObject['data']['genaral']['content'] = custom;
                 // responseJSON.JSONObject['data']['list_state']= Fiddler.WebFormats.JSON.JsonDecode('1').JSONObject;
                 //responseJSON.JSONObject['data']['sug_pos_index']= Fiddler.WebFormats.JSON.JsonDecode('0').JSONObject;
 	    		// responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*100)+1)).JSONObject.toString();
@@ -951,3 +955,14 @@ class Handlers
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
