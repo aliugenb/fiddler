@@ -652,8 +652,7 @@ class Handlers
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-            if ((!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) && oSession.responseCode != 304){
-                MessageBox.Show("接口出错啦！！！");
+            if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')){
                 return;
             }
             var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
@@ -955,7 +954,6 @@ class Handlers
         }
     }
 }
-
 
 
 
