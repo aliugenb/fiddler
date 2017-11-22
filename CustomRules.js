@@ -149,6 +149,9 @@ class Handlers
 	public static RulesOption("图片是否绑定生产", "SwitchHosts")
 	var m_image: boolean = false;
 
+	public static RulesOption("打开304", "打开304")
+	var allow_304: boolean = false;
+
     // Cause Fiddler to delay HTTP traffic to simulate typical 56k modem conditions
     public static RulesOption("Simulate &Modem Speeds", "Per&formance")
     var m_SimulateModem: boolean = false;
@@ -559,12 +562,17 @@ class Handlers
             oSession["ui-backcolor"] = "Lavender";
         }
         
-        // if (oSession.host.Contains("fanli")){
-        //     if(oSession.oRequest.headers.Exists("If-None-Match")){
-        //         oSession.oRequest["If-None-Match"] = 'not304';
-        //     }
-        // }
-     
+        if (!allow_304 && oSession.host.Contains("fanli")){
+            if(oSession.oRequest.headers.Exists("If-None-Match")){
+                oSession.oRequest["If-None-Match"] = 'not304';
+            }
+        }
+        // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
+        // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
+			// oSession.oRequest.headers["If-None-Match"] = 'no-cache';
+			// oSession.oRequest.headers.Remove("Cache-Control");
+	    // }
+
         if (oSession.host.Contains("fanli")){
             if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
                 return;
@@ -644,10 +652,22 @@ class Handlers
         if (m_Hide304s && oSession.responseCode == 304) {
             oSession["ui-hide"] = "true";
         }
-		
-//		if (oSession.fullUrl.Contains("http://fun.fanli.com/goshop/go")){
-//			oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F12881516028.html;s_id=544';
-//	}
+        // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
+        //     oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")||
+        //     oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")||
+        //     oSession.fullUrl.Contains("http://fun.fanli.com/api/mobile/getResource")){
+        // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
+        // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
+        // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")){
+			// oSession.oResponse.headers["Cache-Control"] = 'max-age=60';
+			// oSession.oResponse.headers.Remove("Cache-Control");
+			// oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
+            // oSession.oResponse.headers.Remove("Last-Modified");
+            // oSession.oResponse.headers["Expires"] = 'Mon, 21 Nov 2017 17:28:26 GMT';
+            // oSession.oResponse.headers.Remove("Expires");
+            // oSession.oResponse.headers["Etag"] = (Math.random()*100).toString();
+            // oSession.oResponse.headers.Remove("Etag");
+	    // }
 
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
@@ -954,7 +974,6 @@ class Handlers
         }
     }
 }
-
 
 
 
