@@ -416,7 +416,48 @@ class Handlers
     static function rtrim(str){ //删除右边的空格
         return str.replace(/(\s*$)/g,"");
     }
-	
+
+    static function getAbtest(str){
+        var parts = str.split("-");
+        if (parts == null) {
+            MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
+        }
+        var abtests = new Array();
+        for (var idx = 0; idx < parts.length; idx++) {
+            var testGroup = parts[idx].split("_");
+            if (testGroup == null || testGroup.length != 2) {
+                MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
+            }
+
+            abtests.push( {'testid': testGroup[0], 'group': testGroup[1]});
+        }
+        var request = WebRequest.Create('http://gw.api.fanli.com/route?api=appAbtest.getTestInfoByStoryid&storyid=29210');
+        var response = request.GetResponse();
+        FiddlerObject.log(response);
+        abtests.sort(function(a, b) {
+            return a.testid - b.testid;
+        });
+        var abtests2 = new Array();
+        var testId = 0;
+        for (var idx = 0; idx < abtests.length; idx++) {
+            abtests2.push((abtests[idx].testid - testId) + "_" + abtests[idx].group);
+            testId = abtests[idx].testid;
+        }
+        var result = abtests2.join("-");
+
+        //结果进行md5
+        var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+        var bytResult = md5.ComputeHash(System.Text.Encoding.Default.GetBytes(result));
+        var strResult = BitConverter.ToString(bytResult);
+
+        var md5Str = strResult.Replace("-", "");
+        var md5Sig = md5Str.substring(0, 1) + md5Str.substring(2, 3) + md5Str.substring(4, 5) + md5Str.substring(6, 7);
+        var abtest_result = result + "-" + md5Sig;
+
+        FiddlerObject.log(abtest_result);
+        return abtest_result.toLowerCase();
+    }
+
 	//图片hosts
 	public static var image_hosts = new Array("l0.51fanli.net","l1.51fanli.net","l2.51fanli.net","l3.51fanli.net","l4.51fanli.net","i0.51fanli.net","i1.51fanli.net","i2.51fanli.net","i3.51fanli.net","i4.51fanli.net");
 
@@ -431,10 +472,6 @@ class Handlers
             }
         }
         return false;
-    }
-
-    static function CustomResponse(){
-        return;
     }
 
     static function OnBeforeRequest(oSession: Session) {
@@ -469,7 +506,10 @@ class Handlers
             }
         }
 
-
+        if (null != m_abtest && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
+            var abtest = getAbtest(m_abtest);
+            Fi
+        }
 
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
             var path = "Hosts\\"+m_host+".hosts";
