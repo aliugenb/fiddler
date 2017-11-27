@@ -143,7 +143,7 @@ class Handlers
 	public static var m_host: String = null;	
 
 	RulesString("自定义分流",true)
-	RulesStringValue(0,'Custom', '%custom%')
+	RulesStringValue(0, '输入分流信息,如29210_b-29310_c', '%custom%')
 	public static var m_abtest: String = null;
 
 	public static RulesOption("图片是否绑定生产", "SwitchHosts")
@@ -469,6 +469,8 @@ class Handlers
             }
         }
 
+
+
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
             var path = "Hosts\\"+m_host+".hosts";
             var hosts = GetHosts(path);
@@ -659,7 +661,7 @@ class Handlers
         // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
         // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
         // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")){
-			// oSession.oResponse.headers["Cache-Control"] = 'max-age=60';
+			// oSession.oResponse.headers["Cache-Control"] = 'max-age=30';
 			// oSession.oResponse.headers.Remove("Cache-Control");
 			// oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
             // oSession.oResponse.headers.Remove("Last-Modified");
