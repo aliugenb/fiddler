@@ -697,6 +697,8 @@ class Handlers
         if (m_Hide304s && oSession.responseCode == 304) {
             oSession["ui-hide"] = "true";
         }
+
+        //修改response header
         // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
         //     oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")||
         //     oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")||
@@ -704,7 +706,12 @@ class Handlers
         // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
         // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
         // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")){
-        if (oSession.fullUrl.Contains("goshop")){
+        // if (oSession.fullUrl.Contains("goshop")){
+            // oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fso.m.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
+            // oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F1637718451.html;s_id=544';
+            // oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fproduct%2F1637718451.html;s_id=544';
+            // oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fitem.jd.com%2F1637718451.html;s_id=544';
+            // oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
 			// oSession.oResponse.headers["Cache-Control"] = 'max-age=30';
 			// oSession.oResponse.headers.Remove("Cache-Control");
 			// oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
@@ -713,7 +720,7 @@ class Handlers
             // oSession.oResponse.headers.Remove("Expires");
             // oSession.oResponse.headers["Etag"] = (Math.random()*100).toString();
             // oSession.oResponse.headers.Remove("Etag");
-	    }
+	    // }
 
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
