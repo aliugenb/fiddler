@@ -428,12 +428,14 @@ class Handlers
             if (testGroup == null || testGroup.length != 2) {
                 MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
             }
-
+            var url = 'http://gw.api.fanli.com/route?api=appAbtest.getTestInfoByStoryid&storyid='+ testGroup[0];
+            FiddlerObject.utilIssueRequest( 'GET' +  url +  '');
             abtests.push( {'testid': testGroup[0], 'group': testGroup[1]});
         }
-        var request = WebRequest.Create('http://gw.api.fanli.com/route?api=appAbtest.getTestInfoByStoryid&storyid=29210');
-        var response = request.GetResponse();
-        FiddlerObject.log(response);
+
+        // var request = WebRequest.Create('http://gw.api.fanli.com/route?api=appAbtest.getTestInfoByStoryid&storyid=29210');
+        // var response = request.GetResponse();
+        // FiddlerObject.log(response);
         abtests.sort(function(a, b) {
             return a.testid - b.testid;
         });
@@ -454,7 +456,7 @@ class Handlers
         var md5Sig = md5Str.substring(0, 1) + md5Str.substring(2, 3) + md5Str.substring(4, 5) + md5Str.substring(6, 7);
         var abtest_result = result + "-" + md5Sig;
 
-        FiddlerObject.log(abtest_result);
+        // FiddlerObject.log(abtest_result);
         return abtest_result.toLowerCase();
     }
 
@@ -506,10 +508,9 @@ class Handlers
             }
         }
 
-        if (null != m_abtest && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
-            var abtest = getAbtest(m_abtest);
-            Fi
-        }
+        // if (null != m_abtest && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
+        //     var abtest = getAbtest(m_abtest);
+        // }
 
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
             var path = "Hosts\\"+m_host+".hosts";
@@ -615,25 +616,27 @@ class Handlers
 			// oSession.oRequest.headers.Remove("Cache-Control");
 	    // }
 
-        if (oSession.host.Contains("fanli")){
-            if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
-                return;
-            }
-            var fso;
-            var file;
-            //文件保存路径，可自定义
-            try{
-				fso = new ActiveXObject("Scripting.FileSystemObject");
-                file = fso.OpenTextFile(""+createFolder()+"\\Request.txt",8 ,true, true);
-                file.writeLine(getCurTime());
-                file.writeLine("Request url: " + oSession.fullUrl);
-                file.writeLine("Request header:" + "\n" + oSession.oRequest.headers);
-                file.writeLine("Request body: " + oSession.GetRequestBodyAsString());
-                file.writeLine("\n");
-                file.close();
-            }catch(err){
-            }
-        }
+
+        // 保存request到本地
+        // if (oSession.host.Contains("fanli")){
+        //     if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
+        //         return;
+        //     }
+        //     var fso;
+        //     var file;
+        //     //文件保存路径，可自定义
+        //     try{
+			// 	fso = new ActiveXObject("Scripting.FileSystemObject");
+        //         file = fso.OpenTextFile(""+createFolder()+"\\Request.txt",8 ,true, true);
+        //         file.writeLine(getCurTime());
+        //         file.writeLine("Request url: " + oSession.fullUrl);
+        //         file.writeLine("Request header:" + "\n" + oSession.oRequest.headers);
+        //         file.writeLine("Request body: " + oSession.GetRequestBodyAsString());
+        //         file.writeLine("\n");
+        //         file.close();
+        //     }catch(err){
+        //     }
+        // }
     }
 
     // This function is called immediately after a set of request headers has
@@ -701,6 +704,7 @@ class Handlers
         // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
         // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
         // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")){
+        if (oSession.fullUrl.Contains("goshop")){
 			// oSession.oResponse.headers["Cache-Control"] = 'max-age=30';
 			// oSession.oResponse.headers.Remove("Cache-Control");
 			// oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
@@ -709,7 +713,7 @@ class Handlers
             // oSession.oResponse.headers.Remove("Expires");
             // oSession.oResponse.headers["Etag"] = (Math.random()*100).toString();
             // oSession.oResponse.headers.Remove("Etag");
-	    // }
+	    }
 
         if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
@@ -784,28 +788,28 @@ class Handlers
 		    }
         }
 		
-		
-        if (oSession.host.Contains("fanli")) {
-            if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
-                return;
-            }
-            oSession.utilDecodeResponse();//消除保存的请求可能存在乱码的情况
-            var fso;
-            var file;
-            fso = new ActiveXObject("Scripting.FileSystemObject");
-            try{
-                file = fso.OpenTextFile(""+createFolder()+"\\Response.txt",8 ,true, true);
-                file.writeLine(getCurTime());
-                file.writeLine("Request url: " + oSession.fullUrl);
-                file.writeLine("serverIp: " + oSession.m_hostIP);
-                file.writeLine("Response code: " + oSession.responseCode);
-                file.writeLine("Response body: " + oSession.GetResponseBodyAsString());
-                file.writeLine("\n");
-                file.close();
-            }
-            catch(err){
-                }
-          }
+		// 保存response到本地
+        // if (oSession.host.Contains("fanli")) {
+        //     if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
+        //         return;
+        //     }
+        //     oSession.utilDecodeResponse();//消除保存的请求可能存在乱码的情况
+        //     var fso;
+        //     var file;
+        //     fso = new ActiveXObject("Scripting.FileSystemObject");
+        //     try{
+        //         file = fso.OpenTextFile(""+createFolder()+"\\Response.txt",8 ,true, true);
+        //         file.writeLine(getCurTime());
+        //         file.writeLine("Request url: " + oSession.fullUrl);
+        //         file.writeLine("serverIp: " + oSession.m_hostIP);
+        //         file.writeLine("Response code: " + oSession.responseCode);
+        //         file.writeLine("Response body: " + oSession.GetResponseBodyAsString());
+        //         file.writeLine("\n");
+        //         file.close();
+        //     }
+        //     catch(err){
+        //         }
+        //   }
     }
 
 /*
@@ -901,6 +905,12 @@ class Handlers
 
         var sAction = sParams[0].toLowerCase();
         switch (sAction) {
+        case "abtest":
+            if (sParams.Length<2){m_abtest=null; FiddlerObject.StatusText="abtest cleared"; return false;}
+            m_abtest = sParams[1];FiddlerObject.StatusText="abtest参数 " + sParams[1];
+            m_abtest = getAbtest(m_abtest);
+            FiddlerObject.log(m_abtest);
+            return true;
         case "bold":
             if (sParams.Length<2) {uiBoldURI=null; FiddlerObject.StatusText="Bolding cleared"; return false;}
             uiBoldURI = sParams[1]; FiddlerObject.StatusText="Bolding requests for " + uiBoldURI;
