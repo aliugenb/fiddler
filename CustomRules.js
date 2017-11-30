@@ -142,8 +142,8 @@ class Handlers
 	RulesStringValue(3,"custom内测", "custom-neice")
 	public static var m_host: String = null;	
 
-	RulesString("自定义分流",true)
-	RulesStringValue(0, '输入分流信息,如29210_b-29310_c', '%custom%')
+	// RulesString("自定义分流",true)
+	// RulesStringValue(0, '输入分流信息,如29210_b-29310_c', '%custom%')
 	public static var m_abtest: String = null;
 
 	public static RulesOption("图片是否绑定生产", "SwitchHosts")
@@ -423,13 +423,19 @@ class Handlers
             MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
         }
         var abtests = new Array();
+        var path = '/route?api=appAbtest.getTestInfoByStoryid&storyid=';
         for (var idx = 0; idx < parts.length; idx++) {
             var testGroup = parts[idx].split("_");
             if (testGroup == null || testGroup.length != 2) {
                 MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
             }
-            var url = 'http://gw.api.fanli.com/route?api=appAbtest.getTestInfoByStoryid&storyid='+ testGroup[0];
-            FiddlerObject.utilIssueRequest( 'GET' +  url +  '');
+            var s = 'GET '+ path + testGroup[0] + ' HTTP/1.1\r\nHost: gw.api.fanli.com\r\ncustom_header:abtest\r\n\r\n';
+            try{
+                FiddlerObject.utilIssueRequest(s);
+            }catch(e){
+                MessageBox.Show("send failed" + e.ToString());
+            }
+            // FiddlerObject.utilIssueRequest( 'GET' +  url +  '');
             abtests.push( {'testid': testGroup[0], 'group': testGroup[1]});
         }
 
@@ -508,9 +514,14 @@ class Handlers
             }
         }
 
+        if (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl")){
         // if (null != m_abtest && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
-        //     var abtest = getAbtest(m_abtest);
-        // }
+            // var abtest = getAbtest(m_abtest);
+            FiddlerObject.log(m_abtest);
+            if (!m_abtest){
+                FiddlerObject.log('abtest cleared');
+            }
+        }
 
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
             var path = "Hosts\\"+m_host+".hosts";
