@@ -417,25 +417,6 @@ class Handlers
         return str.replace(/(\s*$)/g,"");
     }
 
-    public static ToolsAction("Find page containing search string")
-    function doGrab(){
-        // var s = "GET /route?api=appAbtest.getTestInfoByStoryid&storyid=29210 HTTP/1.1\r\nHost: gw.api.fanli.com\r\ncustom_abtest\r\n\r\n";
-        var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders("/route?api=appAbtest.getTestInfoByStoryid&storyid=29210", ['Host: gw.api.fanli.com', 'custom_abtest: ']);
-        abtest_headers.HTTPMethod = "GET";
-        // var oSD = new System.Collections.Specialized.StringDictionary();
-        var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);
-        FiddlerObject.log(abtest_session.responseCode);
-        if(200 == abtest_session.responseCode){
-            FiddlerObject.log(abtest_session.utilFindInResponse("60919", false) > -1);
-            // abtest_session.headers.Exists("custom_abtest")
-        }
-        // try{
-        //     FiddlerObject.utilIssueRequest(s);
-        // } catch(e){
-        //     MessageBox.Show("send failed" + e.ToString());
-        // }
-    }
-
     static function getAbtest(str){
         var parts = str.split("-");
         if (parts == null) {
@@ -457,7 +438,7 @@ class Handlers
                 var responseStringOriginal =  abtest_session.GetResponseBodyAsString();
                 var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
                 if (abtest_session.utilFindInResponse("id", false) > -1){
-                    testGroup[0] = responseJSON.JSONObject['id'];
+                    testGroup[0] = responseJSON.JSONObject['data']['id'];
                 }
                 else {
                     MessageBox.Show(testGroup[0]+"没有对应的testid");
@@ -495,7 +476,7 @@ class Handlers
         var md5Str = strResult.Replace("-", "");
         var md5Sig = md5Str.substring(0, 1) + md5Str.substring(2, 3) + md5Str.substring(4, 5) + md5Str.substring(6, 7);
         var abtest_result = result + "-" + md5Sig;
-        FiddlerObject.log(abtest_result);
+
         return abtest_result.toLowerCase();
     }
 
@@ -547,7 +528,7 @@ class Handlers
                 mark_txt.close();
             }
         }
-        // FiddlerObject.log(m_abtest);
+        FiddlerObject.log(m_abtest);
         if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
             oSession.fullUrl = oSession.fullUrl.replace(/&abtest=.*(&)?/, '&abtest='+m_abtest);
         }
@@ -738,15 +719,6 @@ class Handlers
         if (m_Hide304s && oSession.responseCode == 304) {
             oSession["ui-hide"] = "true";
         }
-
-        // if (oSession.oRequest.headers.Exists("custom_abtest")) {
-        //     FiddlerObject.log('abtest11111');
-            // This is a response to my Grab code...
-        //     if (oSession.utilFindInResponse("60919", false) > -1) {
-        //         // If the index of the target string is >-1, we found the search string...
-        //         FiddlerObject.log("Found target string!");
-        //     }
-        // }
 
         //修改response header
         // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
