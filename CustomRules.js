@@ -417,10 +417,30 @@ class Handlers
         return str.replace(/(\s*$)/g,"");
     }
 
+    public static ToolsAction("Find page containing search string")
+    function doGrab(){
+        // var s = "GET /route?api=appAbtest.getTestInfoByStoryid&storyid=29210 HTTP/1.1\r\nHost: gw.api.fanli.com\r\ncustom_abtest\r\n\r\n";
+        var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders("/route?api=appAbtest.getTestInfoByStoryid&storyid=29210", ['Host: gw.api.fanli.com', 'custom_abtest: ']);
+        abtest_headers.HTTPMethod = "GET";
+        // var oSD = new System.Collections.Specialized.StringDictionary();
+        var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);
+        FiddlerObject.log(abtest_session.responseCode);
+        if(200 == abtest_session.responseCode){
+            FiddlerObject.log(abtest_session.utilFindInResponse("60919", false) > -1);
+            // abtest_session.headers.Exists("custom_abtest")
+        }
+        // try{
+        //     FiddlerObject.utilIssueRequest(s);
+        // } catch(e){
+        //     MessageBox.Show("send failed" + e.ToString());
+        // }
+    }
+
     static function getAbtest(str){
         var parts = str.split("-");
         if (parts == null) {
             MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
+            return;
         }
         var abtests = new Array();
         var path = '/route?api=appAbtest.getTestInfoByStoryid&storyid=';
@@ -428,20 +448,34 @@ class Handlers
             var testGroup = parts[idx].split("_");
             if (testGroup == null || testGroup.length != 2) {
                 MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
+                return;
             }
-            var s = 'GET '+ path + testGroup[0] + ' HTTP/1.1\r\nHost: gw.api.fanli.com\r\ncustom_header:abtest\r\n\r\n';
-            try{
-                FiddlerObject.utilIssueRequest(s);
-            }catch(e){
-                MessageBox.Show("send failed" + e.ToString());
+            var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path + testGroup[0], ['Host: gw.api.fanli.com', 'custom_abtest: '+ testGroup[0]]);
+            abtest_headers.HTTPMethod = "GET";
+            var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);
+            if (200 == abtest_session.responseCode){
+                var responseStringOriginal =  abtest_session.GetResponseBodyAsString();
+                var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+                if (abtest_session.utilFindInResponse("id", false) > -1){
+                    testGroup[0] = responseJSON.JSONObject['id'];
+                }
+                else {
+                    MessageBox.Show(testGroup[0]+"没有对应的testid");
+                    return;
+                }
             }
-            // FiddlerObject.utilIssueRequest( 'GET' +  url +  '');
+            else {
+                MessageBox.Show(testGroup[0]+"内部gw接口调用错误");
+                return;
+            }
+            // var s = 'GET '+ path + testGroup[0] + ' HTTP/1.1\r\nHost: gw.api.fanli.com\r\ncustom_header:abtest\r\n\r\n';
+            // try{
+            //     FiddlerObject.utilIssueRequest(s);
+            // }catch(e){
+            //     MessageBox.Show("send failed" + e.ToString());
+            // }
             abtests.push( {'testid': testGroup[0], 'group': testGroup[1]});
         }
-
-        // var request = WebRequest.Create('http://gw.api.fanli.com/route?api=appAbtest.getTestInfoByStoryid&storyid=29210');
-        // var response = request.GetResponse();
-        // FiddlerObject.log(response);
         abtests.sort(function(a, b) {
             return a.testid - b.testid;
         });
@@ -452,7 +486,7 @@ class Handlers
             testId = abtests[idx].testid;
         }
         var result = abtests2.join("-");
-
+        //abtest 29210_b-21395_c-19260_b-26654_b
         //结果进行md5
         var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
         var bytResult = md5.ComputeHash(System.Text.Encoding.Default.GetBytes(result));
@@ -461,8 +495,7 @@ class Handlers
         var md5Str = strResult.Replace("-", "");
         var md5Sig = md5Str.substring(0, 1) + md5Str.substring(2, 3) + md5Str.substring(4, 5) + md5Str.substring(6, 7);
         var abtest_result = result + "-" + md5Sig;
-
-        // FiddlerObject.log(abtest_result);
+        FiddlerObject.log(abtest_result);
         return abtest_result.toLowerCase();
     }
 
@@ -499,6 +532,7 @@ class Handlers
          //     oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓
 		// }
 
+
         if (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl")){
             var fso=new ActiveXObject("Scripting.FileSystemObject");
             if(fso.FileExists("markUrls.txt")){
@@ -513,14 +547,9 @@ class Handlers
                 mark_txt.close();
             }
         }
-
-        if (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl")){
-        // if (null != m_abtest && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
-            // var abtest = getAbtest(m_abtest);
-            FiddlerObject.log(m_abtest);
-            if (!m_abtest){
-                FiddlerObject.log('abtest cleared');
-            }
+        // FiddlerObject.log(m_abtest);
+        if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
+            oSession.fullUrl = oSession.fullUrl.replace(/&abtest=.*(&)?/, '&abtest='+m_abtest);
         }
 
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
@@ -621,6 +650,7 @@ class Handlers
                 oSession.oRequest["If-None-Match"] = 'not304';
             }
         }
+
         // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
         // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
 			// oSession.oRequest.headers["If-None-Match"] = 'no-cache';
@@ -708,6 +738,15 @@ class Handlers
         if (m_Hide304s && oSession.responseCode == 304) {
             oSession["ui-hide"] = "true";
         }
+
+        // if (oSession.oRequest.headers.Exists("custom_abtest")) {
+        //     FiddlerObject.log('abtest11111');
+            // This is a response to my Grab code...
+        //     if (oSession.utilFindInResponse("60919", false) > -1) {
+        //         // If the index of the target string is >-1, we found the search string...
+        //         FiddlerObject.log("Found target string!");
+        //     }
+        // }
 
         //修改response header
         // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
@@ -927,7 +966,6 @@ class Handlers
             if (sParams.Length<2){m_abtest=null; FiddlerObject.StatusText="abtest cleared"; return false;}
             m_abtest = sParams[1];FiddlerObject.StatusText="abtest参数 " + sParams[1];
             m_abtest = getAbtest(m_abtest);
-            FiddlerObject.log(m_abtest);
             return true;
         case "bold":
             if (sParams.Length<2) {uiBoldURI=null; FiddlerObject.StatusText="Bolding cleared"; return false;}
@@ -1044,6 +1082,7 @@ class Handlers
         }
     }
 }
+
 
 
 
