@@ -142,10 +142,6 @@ class Handlers
 	RulesStringValue(3,"custom内测", "custom-neice")
 	public static var m_host: String = null;	
 
-	// RulesString("自定义分流",true)
-	// RulesStringValue(0, '输入分流信息,如29210_b-29310_c', '%custom%')
-	public static var m_abtest: String = null;
-
 	public static RulesOption("图片是否绑定生产", "SwitchHosts")
 	var m_image: boolean = false;
 
@@ -214,28 +210,28 @@ class Handlers
         UI.actUpdateInspector(true,true);
     }
     
-    public static ContextAction("CopyTimers")
-    function CopyTimers(oSessions: Fiddler.Session[]){
-        if (null == oSessions){
-            MessageBox.Show("Please select sessions to copy timers for.", "Nothing to Do");
-            return;
-        }
-        var s: System.Text.StringBuilder = new System.Text.StringBuilder();
-        for (var x = 0; x < oSessions.Length; x++)  {
-            s.AppendFormat("ClientConnected:{0}, ClientDoneRequest:{1}, ServerConnected:{2}, ServerGotRequest:{3}, ServerBeginResponse:{4}, ServerDoneResponse:{5}, ClientBeginResponse:{6}, ClientDoneResponse:{7}\r\n",
-                oSessions[x].Timers.ClientConnected,
-                oSessions[x].Timers.ClientDoneRequest,
-                oSessions[x].Timers.ServerConnected,
-                oSessions[x].Timers.ServerGotRequest,
-                oSessions[x].Timers.ServerBeginResponse,
-                oSessions[x].Timers.ServerDoneResponse,
-                oSessions[x].Timers.ClientBeginResponse,
-                oSessions[x].Timers.ClientDoneResponse
-                );
-        }
-        Utilities.CopyToClipboard(s.ToString());
-        MessageBox.Show("已复制到剪切板.");
-    }
+    // public static ContextAction("CopyTimers")
+    // function CopyTimers(oSessions: Fiddler.Session[]){
+    //     if (null == oSessions){
+    //         MessageBox.Show("Please select sessions to copy timers for.", "Nothing to Do");
+    //         return;
+    //     }
+    //     var s: System.Text.StringBuilder = new System.Text.StringBuilder();
+    //     for (var x = 0; x < oSessions.Length; x++)  {
+    //         s.AppendFormat("ClientConnected:{0}, ClientDoneRequest:{1}, ServerConnected:{2}, ServerGotRequest:{3}, ServerBeginResponse:{4}, ServerDoneResponse:{5}, ClientBeginResponse:{6}, ClientDoneResponse:{7}\r\n",
+    //             oSessions[x].Timers.ClientConnected,
+    //             oSessions[x].Timers.ClientDoneRequest,
+    //             oSessions[x].Timers.ServerConnected,
+    //             oSessions[x].Timers.ServerGotRequest,
+    //             oSessions[x].Timers.ServerBeginResponse,
+    //             oSessions[x].Timers.ServerDoneResponse,
+    //             oSessions[x].Timers.ClientBeginResponse,
+    //             oSessions[x].Timers.ClientDoneResponse
+    //             );
+    //     }
+    //     Utilities.CopyToClipboard(s.ToString());
+    //     MessageBox.Show("已复制到剪切板.");
+    // }
 
     //bpafter url
     public static var bpResponseURIs = new Array();
@@ -417,9 +413,10 @@ class Handlers
         return str.replace(/(\s*$)/g,"");
     }
 
+    public static var m_abtest: String = null;
     static function getAbtest(str){
         var parts = str.split("-");
-        if (parts == null) {
+        if (null == parts) {
             MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
             return;
         }
@@ -427,7 +424,7 @@ class Handlers
         var path = '/route?api=appAbtest.getTestInfoByStoryid&storyid=';
         for (var idx = 0; idx < parts.length; idx++) {
             var testGroup = parts[idx].split("_");
-            if (testGroup == null || testGroup.length != 2) {
+            if (null == testGroup || testGroup.length != 2) {
                 MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
                 return;
             }
@@ -528,9 +525,9 @@ class Handlers
                 mark_txt.close();
             }
         }
-        FiddlerObject.log(m_abtest);
+
         if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
-            oSession.fullUrl = oSession.fullUrl.replace(/&abtest=.*(&)?/, '&abtest='+m_abtest);
+            oSession.fullUrl = oSession.fullUrl.replace(/&abtest=(.*)(&)?/, '&abtest='+m_abtest);
         }
 
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
