@@ -446,12 +446,6 @@ class Handlers
                 MessageBox.Show(testGroup[0]+"内部gw接口调用错误");
                 return;
             }
-            // var s = 'GET '+ path + testGroup[0] + ' HTTP/1.1\r\nHost: gw.api.fanli.com\r\ncustom_header:abtest\r\n\r\n';
-            // try{
-            //     FiddlerObject.utilIssueRequest(s);
-            // }catch(e){
-            //     MessageBox.Show("send failed" + e.ToString());
-            // }
             abtests.push( {'testid': testGroup[0], 'group': testGroup[1]});
         }
         abtests.sort(function(a, b) {
@@ -511,7 +505,7 @@ class Handlers
 		// }
 
 
-        if (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl")){
+        if (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn")){
             var fso=new ActiveXObject("Scripting.FileSystemObject");
             if(fso.FileExists("markUrls.txt")){
                 var mark_txt = fso.OpenTextFile("markUrls.txt",1,true,true);
@@ -526,11 +520,11 @@ class Handlers
             }
         }
 
-        if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
-            oSession.fullUrl = oSession.fullUrl.replace(/&abtest=(.*)(&)?/, '&abtest='+m_abtest);
+        if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn"))){
+            oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, '&abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
         }
 
-        if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
+        if (null != m_host && (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn"))){
             var path = "Hosts\\"+m_host+".hosts";
             var hosts = GetHosts(path);
             var original_ip = oSession.m_hostIP;
