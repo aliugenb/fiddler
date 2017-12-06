@@ -125,14 +125,14 @@ class Handlers
 	RulesStringValue(0,"打开", "1")
 	public static var custom_response: String = null;
 
-	public static RulesOption("切换xwalk", "切换浏览器内核")
-	var xwalk: boolean = false;
-
-	public static RulesOption("切换webkit", "切换浏览器内核")
-	var webkit: boolean = false;
-
-    public static RulesOption("恢复uiwebview", "切换浏览器内核")
-	var uiwebview: boolean = false;
+	// public static RulesOption("切换xwalk", "切换浏览器内核")
+	// var xwalk: boolean = false;
+    //
+	// public static RulesOption("切换webkit", "切换浏览器内核")
+	// var webkit: boolean = false;
+    //
+    // public static RulesOption("恢复uiwebview", "切换浏览器内核")
+	// var uiwebview: boolean = false;
 
 	RulesString("SwitchHosts",true)
 	RulesStringValue(0,"外测", "waice")
@@ -489,20 +489,21 @@ class Handlers
 
     static function OnBeforeRequest(oSession: Session) {
         // Sample Rule: Color ASPX requests in RED
-     //   if (oSession.responseCode == 404){
-     //       FiddlerObject.playSound("C:\\windows\\media\\tada.wav");
-     //       oSession["ui-strikeout"]="true";
-      //  }
-      //   if ((oSession.uriContains("http://fun.fanli.com/goshop/go")) && (oSession.uriContains("source=override")))  {
-      //       oSession["ui-backcolor"] = "Yellow";
-      //       oSession["ui-customcolumn"] = '高佣api';
-         //   FiddlerObject.playSound("C:\\windows\\media\\tada.wav");
-         //   oSession["ui-color"] = "red"; //设置字体颜色，颜色名称
-         //   oSession["ui-italic"] = "yup"; //设置字体斜体，字符串无所谓
-         //   oSession["ui-bold"]="QuickExec";	//设置字体加粗，字符串无所谓
-         //   oSession["ui-backcolor"] = "Lavender";	//设置背景颜色，颜色名称
-         //     oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓
-		// }
+       if (oSession.responseCode == 404){
+           FiddlerObject.playSound("C:\\windows\\media\\tada.wav");
+           oSession["ui-strikeout"]="true";
+       }
+       /*
+        if ((oSession.uriContains("http://fun.fanli.com/goshop/go")) && (oSession.uriContains("source=override")))  {
+            oSession["ui-backcolor"] = "Yellow";
+            oSession["ui-customcolumn"] = '高佣api';
+           FiddlerObject.playSound("C:\\windows\\media\\tada.wav");
+           oSession["ui-color"] = "red"; //设置字体颜色，颜色名称
+           oSession["ui-italic"] = "yup"; //设置字体斜体，字符串无所谓
+           oSession["ui-bold"]="QuickExec";	//设置字体加粗，字符串无所谓
+           oSession["ui-backcolor"] = "Lavender";	//设置背景颜色，颜色名称
+             oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓
+		}*/
 
 
         if (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn")){
@@ -625,33 +626,33 @@ class Handlers
             }
         }
 
-        // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
-        // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
-			// oSession.oRequest.headers["If-None-Match"] = 'no-cache';
-			// oSession.oRequest.headers.Remove("Cache-Control");
-	    // }
+        /*if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
+        if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
+			oSession.oRequest.headers["If-None-Match"] = 'no-cache';
+			oSession.oRequest.headers.Remove("Cache-Control");
+	    }*/
 
 
         // 保存request到本地
-        // if (oSession.host.Contains("fanli")){
-        //     if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
-        //         return;
-        //     }
-        //     var fso;
-        //     var file;
-        //     //文件保存路径，可自定义
-        //     try{
-			// 	fso = new ActiveXObject("Scripting.FileSystemObject");
-        //         file = fso.OpenTextFile(""+createFolder()+"\\Request.txt",8 ,true, true);
-        //         file.writeLine(getCurTime());
-        //         file.writeLine("Request url: " + oSession.fullUrl);
-        //         file.writeLine("Request header:" + "\n" + oSession.oRequest.headers);
-        //         file.writeLine("Request body: " + oSession.GetRequestBodyAsString());
-        //         file.writeLine("\n");
-        //         file.close();
-        //     }catch(err){
-        //     }
-        // }
+        /*if (oSession.host.Contains("fanli")){
+            if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
+                return;
+            }
+            var fso;
+            var file;
+            //文件保存路径，可自定义
+            try{
+				fso = new ActiveXObject("Scripting.FileSystemObject");
+                file = fso.OpenTextFile(""+createFolder()+"\\Request.txt",8 ,true, true);
+                file.writeLine(getCurTime());
+                file.writeLine("Request url: " + oSession.fullUrl);
+                file.writeLine("Request header:" + "\n" + oSession.oRequest.headers);
+                file.writeLine("Request body: " + oSession.GetRequestBodyAsString());
+                file.writeLine("\n");
+                file.close();
+            }catch(err){
+            }
+        }*/
     }
 
     // This function is called immediately after a set of request headers has
@@ -714,30 +715,30 @@ class Handlers
         }
 
         //修改response header
-        // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
-        //     oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")||
-        //     oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")||
-        //     oSession.fullUrl.Contains("http://fun.fanli.com/api/mobile/getResource")){
-        // if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
-        // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
-        // if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")){
-        // if (oSession.fullUrl.Contains("goshop")){
-            // oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fso.m.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
-            // oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F1637718451.html;s_id=544';
-            // oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fproduct%2F1637718451.html;s_id=544';
-            // oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fitem.jd.com%2F1637718451.html;s_id=544';
-            // oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
-			// oSession.oResponse.headers["Cache-Control"] = 'max-age=30';
-			// oSession.oResponse.headers.Remove("Cache-Control");
-			// oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
-            // oSession.oResponse.headers.Remove("Last-Modified");
-            // oSession.oResponse.headers["Expires"] = 'Mon, 21 Nov 2017 17:28:26 GMT';
-            // oSession.oResponse.headers.Remove("Expires");
-            // oSession.oResponse.headers["Etag"] = (Math.random()*100).toString();
-            // oSession.oResponse.headers.Remove("Etag");
-	    // }
+        /*if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
+            oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")||
+            oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")||
+            oSession.fullUrl.Contains("http://fun.fanli.com/api/mobile/getResource")){
+        if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
+        if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
+        if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")){
+        if (oSession.fullUrl.Contains("goshop")){
+            oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fso.m.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F1637718451.html;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fproduct%2F1637718451.html;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fitem.jd.com%2F1637718451.html;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
+			oSession.oResponse.headers["Cache-Control"] = 'max-age=30';
+			oSession.oResponse.headers.Remove("Cache-Control");
+			oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
+            oSession.oResponse.headers.Remove("Last-Modified");
+            oSession.oResponse.headers["Expires"] = 'Mon, 21 Nov 2017 17:28:26 GMT';
+            oSession.oResponse.headers.Remove("Expires");
+            oSession.oResponse.headers["Etag"] = (Math.random()*100).toString();
+            oSession.oResponse.headers.Remove("Etag");
+	    }*/
 
-        if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
+        /*if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
             var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
             if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')){
@@ -781,7 +782,7 @@ class Handlers
             responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
             oSession.utilSetResponseBody(responseStringDestinal);
-        }
+        }*/
 
         if (custom_response){
 			// if (oSession.fullUrl.Contains("key=popmsg")) {
@@ -811,27 +812,27 @@ class Handlers
         }
 		
 		// 保存response到本地
-        // if (oSession.host.Contains("fanli")) {
-        //     if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
-        //         return;
-        //     }
-        //     oSession.utilDecodeResponse();//消除保存的请求可能存在乱码的情况
-        //     var fso;
-        //     var file;
-        //     fso = new ActiveXObject("Scripting.FileSystemObject");
-        //     try{
-        //         file = fso.OpenTextFile(""+createFolder()+"\\Response.txt",8 ,true, true);
-        //         file.writeLine(getCurTime());
-        //         file.writeLine("Request url: " + oSession.fullUrl);
-        //         file.writeLine("serverIp: " + oSession.m_hostIP);
-        //         file.writeLine("Response code: " + oSession.responseCode);
-        //         file.writeLine("Response body: " + oSession.GetResponseBodyAsString());
-        //         file.writeLine("\n");
-        //         file.close();
-        //     }
-        //     catch(err){
-        //         }
-        //   }
+        /*if (oSession.host.Contains("fanli")) {
+            if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
+                return;
+            }
+            oSession.utilDecodeResponse();//消除保存的请求可能存在乱码的情况
+            var fso;
+            var file;
+            fso = new ActiveXObject("Scripting.FileSystemObject");
+            try{
+                file = fso.OpenTextFile(""+createFolder()+"\\Response.txt",8 ,true, true);
+                file.writeLine(getCurTime());
+                file.writeLine("Request url: " + oSession.fullUrl);
+                file.writeLine("serverIp: " + oSession.m_hostIP);
+                file.writeLine("Response code: " + oSession.responseCode);
+                file.writeLine("Response body: " + oSession.GetResponseBodyAsString());
+                file.writeLine("\n");
+                file.close();
+            }
+            catch(err){
+                }
+          }*/
     }
 
 /*
