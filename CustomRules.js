@@ -475,7 +475,7 @@ class Handlers
 	public static var image_hosts = new Array("l0.51fanli.net","l1.51fanli.net","l2.51fanli.net","l3.51fanli.net","l4.51fanli.net","i0.51fanli.net","i1.51fanli.net","i2.51fanli.net","i3.51fanli.net","i4.51fanli.net");
 
     //不用处理的hosts
-    public static var filter_hosts = new Array("appdev.office.51fanli.com","bbs.qa.51fanli.com","mid.qa.51fanli.com","chandao.office.51fanli.com","rbac.fanli.com","rbac.51fanli.com","redis2.51fanli.com","redis2.fanli.com")
+    public static var filter_hosts = new Array("trace.fanli.com","app.office.51fanli.com","app.office.fanli.com","appdev.office.51fanli.com","bbs.qa.51fanli.com","mid.qa.51fanli.com","chandao.office.51fanli.com","rbac.fanli.com","rbac.51fanli.com","redis2.51fanli.com","redis2.fanli.com")
 
     static function inArray(arr, str) {
         var i = arr.length;
@@ -523,7 +523,7 @@ class Handlers
 
         if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn"))){
             if (!inArray(filter_hosts, oSession.host)){
-                oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, '&abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
+                oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, 'abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
             }
         }
 
@@ -581,7 +581,7 @@ class Handlers
             oSession["ui-bold"]="QuickExec";
         }
 
-        if ((m_SimulateModem)&&(oSession.fullUrl.Contains("v2/shop/getFanliRule"))) {
+        if ((m_SimulateModem)&&(oSession.fullUrl.Contains("app.office.51fanli.com/app/P7180184.mp4"))) {
             // Delay sends by 300ms per KB uploaded.
             oSession["request-trickle-delay"] = "3"; 
             // Delay receives by 150ms per KB downloaded.
@@ -1048,6 +1048,10 @@ class Handlers
         }
     }
 }
+
+
+
+
 
 
 
