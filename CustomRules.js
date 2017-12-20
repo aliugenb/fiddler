@@ -528,14 +528,16 @@ class Handlers
         }
 
         if (null != m_host && (oSession.host.Contains("fanli")|| oSession.host.Contains("shzyfl"))){
-            var path = "Hosts\\"+m_host+".hosts";
+            var path = "Hosts\\" + m_host + ".hosts";
             var hosts = GetHosts(path);
             var original_ip = oSession.m_hostIP;
-            for(var i=0; i<hosts.length; i++){
-                var host = hosts[i].Host
-                var ip = hosts[i].IP
-                if (oSession.HostnameIs(host)){
-                    oSession["x-overridehost"] = ip;
+            if (!oSession.host.Contains('app.office.fanli.com')) {
+                for (var i = 0; i < hosts.length; i++) {
+                    var host = hosts[i].Host
+                    var ip = hosts[i].IP
+                    if (oSession.HostnameIs(host)) {
+                        oSession["x-overridehost"] = ip;
+                    }
                 }
             }
             if (Handlers.m_image && inArray(image_hosts, oSession.host)){
