@@ -302,21 +302,22 @@ class Handlers
         url = beforeUrl+nextUrl;
         return url;
     }
+
+    //获取指定参数及参数值
 	static function getParam(url,paramKey){
 		var urlParams = url.substr(url.indexOf("?")+1);
-		var arr = new Array();
 		var urlParam = {};
-		if(urlParam!=""){
+		if(urlParams!=""){
 			var urlParamArr = urlParams.split("&");
 			for(var i=0;i<urlParamArr.length;i++){
 				var paramArr = urlParamArr[i].split("=");
-				if(paramArr[0]!=paramKey){
-					arr.push(urlParamArr[i]);
+				if(paramArr[0] == paramKey){
+					urlParam.Param = paramArr[0];
+					urlParam.Value = paramArr[1];
 				}
 			}
 		}
-
-		return url;
+		return urlParam;
 	}
     public static ContextAction("&Remove Mark")
     function RemoveMark(){
@@ -731,7 +732,7 @@ class Handlers
             oSession["ui-hide"] = "true";
         }
 		// if (oSession.fullUrl.Contains("http://fun.fanli.com/goshop/go?")){
-		// 	var i_id = oSession.fullUrl.match(/(?![?|&]pid=)[\d]{12}/);
+		// 	var i_id = getParam(oSession.fullUrl, "pid").Value;
 		// 	oSession.oResponse.headers["Ext"] = "i_id="+i_id+""+";s_id=712";
 		// }
         //修改response header
