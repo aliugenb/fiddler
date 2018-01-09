@@ -303,6 +303,29 @@ class Handlers
         return url;
     }
 
+    //替换指定参数值
+    static function delParam(url,paramKey,paramValue){
+        var urlParam = url.substr(url.indexOf("?")+1);
+        var beforeUrl = url.substr(0,url.indexOf("?"));
+        var nextUrl = "";
+        var arr = new Array();
+        if(urlParam!=""){
+            var urlParamArr = urlParam.split("&");
+            for(var i=0;i<urlParamArr.length;i++){
+                var paramArr = urlParamArr[i].split("=");
+                if(paramArr[0] == paramKey){
+                    paramArr[1] = paramValue;
+                }
+                arr.push(urlParamArr[i]);
+            }
+        }
+        if(arr.length>0){
+            nextUrl = "?"+arr.join("&");
+        }
+        url = beforeUrl+nextUrl;
+        return url;
+    }
+
     //获取指定参数及参数值
 	static function getParam(url,paramKey){
 		var urlParams = url.substr(url.indexOf("?")+1);
