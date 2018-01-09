@@ -303,12 +303,11 @@ class Handlers
         return url;
     }
 	static function getParam(url,paramKey){
-		var urlParam = url.substr(url.indexOf("?")+1);
-		var beforeUrl = url.substr(0,url.indexOf("?"));
-		var nextUrl = "";
+		var urlParams = url.substr(url.indexOf("?")+1);
 		var arr = new Array();
+		var urlParam = {};
 		if(urlParam!=""){
-			var urlParamArr = urlParam.split("&");
+			var urlParamArr = urlParams.split("&");
 			for(var i=0;i<urlParamArr.length;i++){
 				var paramArr = urlParamArr[i].split("=");
 				if(paramArr[0]!=paramKey){
@@ -316,10 +315,7 @@ class Handlers
 				}
 			}
 		}
-		if(arr.length>0){
-			nextUrl = "?"+arr.join("&");
-		}
-		url = beforeUrl+nextUrl;
+
 		return url;
 	}
     public static ContextAction("&Remove Mark")
