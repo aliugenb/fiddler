@@ -302,7 +302,26 @@ class Handlers
         url = beforeUrl+nextUrl;
         return url;
     }
-        
+	static function getParam(url,paramKey){
+		var urlParam = url.substr(url.indexOf("?")+1);
+		var beforeUrl = url.substr(0,url.indexOf("?"));
+		var nextUrl = "";
+		var arr = new Array();
+		if(urlParam!=""){
+			var urlParamArr = urlParam.split("&");
+			for(var i=0;i<urlParamArr.length;i++){
+				var paramArr = urlParamArr[i].split("=");
+				if(paramArr[0]!=paramKey){
+					arr.push(urlParamArr[i]);
+				}
+			}
+		}
+		if(arr.length>0){
+			nextUrl = "?"+arr.join("&");
+		}
+		url = beforeUrl+nextUrl;
+		return url;
+	}
     public static ContextAction("&Remove Mark")
     function RemoveMark(){
         var fso=new ActiveXObject("Scripting.FileSystemObject");
@@ -583,11 +602,11 @@ class Handlers
             oSession["ui-bold"]="QuickExec";
         }
 
-        if ((m_SimulateModem)&&(oSession.fullUrl.Contains("app.office.51fanli.com/app/P7180184.mp4"))) {
+        if ((m_SimulateModem)&&(oSession.fullUrl.Contains("app.office.51fanli.com/app/splashvideo.mp4"))) {
             // Delay sends by 300ms per KB uploaded.
             oSession["request-trickle-delay"] = "3"; 
             // Delay receives by 150ms per KB downloaded.
-            oSession["response-trickle-delay"] = "1770"; 
+            oSession["response-trickle-delay"] = "111770"; 
         }
 
         if (m_DisableCaching) {
@@ -715,7 +734,10 @@ class Handlers
         if (m_Hide304s && oSession.responseCode == 304) {
             oSession["ui-hide"] = "true";
         }
-
+		if (oSession.fullUrl.Contains("http://fun.fanli.com/goshop/go?")){
+			var i_id = oSession.fullUrl.match(/(?![?|&]pid=)[\d]{12}/);
+			oSession.oResponse.headers["Ext"] = "i_id="+i_id+""+";s_id=712";
+		}
         //修改response header
         /*if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
             oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")||
@@ -1050,6 +1072,8 @@ class Handlers
         }
     }
 }
+
+
 
 
 
