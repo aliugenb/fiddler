@@ -734,10 +734,10 @@ class Handlers
         if (m_Hide304s && oSession.responseCode == 304) {
             oSession["ui-hide"] = "true";
         }
-		if (oSession.fullUrl.Contains("http://fun.fanli.com/goshop/go?")){
-			var i_id = oSession.fullUrl.match(/(?![?|&]pid=)[\d]{12}/);
-			oSession.oResponse.headers["Ext"] = "i_id="+i_id+""+";s_id=712";
-		}
+		// if (oSession.fullUrl.Contains("http://fun.fanli.com/goshop/go?")){
+		// 	var i_id = oSession.fullUrl.match(/(?![?|&]pid=)[\d]{12}/);
+		// 	oSession.oResponse.headers["Ext"] = "i_id="+i_id+""+";s_id=712";
+		// }
         //修改response header
         /*if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
             oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")||
