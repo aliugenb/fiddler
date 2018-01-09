@@ -304,11 +304,10 @@ class Handlers
     }
 
     //替换指定参数值
-    static function delParam(url,paramKey,paramValue){
+    static function replaceParam(url, paramKey, paramValue){
         var urlParam = url.substr(url.indexOf("?")+1);
         var beforeUrl = url.substr(0,url.indexOf("?"));
         var nextUrl = "";
-        var arr = new Array();
         if(urlParam!=""){
             var urlParamArr = urlParam.split("&");
             for(var i=0;i<urlParamArr.length;i++){
@@ -316,11 +315,12 @@ class Handlers
                 if(paramArr[0] == paramKey){
                     paramArr[1] = paramValue;
                 }
-                arr.push(urlParamArr[i]);
             }
-        }
-        if(arr.length>0){
-            nextUrl = "?"+arr.join("&");
+            FiddlerObject.log(urlParamArr);
+            nextUrl = "?"+urlParamArr.join("&");
+            FiddlerObject.log(nextUrl);
+        }else {
+            nextUrl = "?"+ paramKey+"="+paramValue;
         }
         url = beforeUrl+nextUrl;
         return url;
@@ -562,7 +562,8 @@ class Handlers
 
         if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn"))){
             if (!inArray(filter_hosts, oSession.host)){
-                oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, 'abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
+                // oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, 'abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
+                oSession.fullUrl = replaceParam(oSession.fullUrl,"abtest",m_abtest);
             }
         }
 
