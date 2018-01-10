@@ -522,10 +522,23 @@ class Handlers
     //不用处理的hosts
     public static var filter_hosts = new Array("trace.fanli.com","app.office.51fanli.com","app.office.fanli.com","appdev.office.51fanli.com","bbs.qa.51fanli.com","mid.qa.51fanli.com","chandao.office.51fanli.com","rbac.fanli.com","rbac.51fanli.com","redis2.51fanli.com","redis2.fanli.com")
 
+    //不用处理的链接
+    public static var filter_urls = new Array("http://super.fanli.com/api/app/");
+
     static function inArray(arr, str) {
         var i = arr.length;
         while (i--) {
             if (arr[i] === str) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static function findInRequestUrl(url, arr){
+        var i = arr.length;
+        while (i--) {
+            if (url.indexOf(arr[i])>=0) {
                 return true;
             }
         }
@@ -566,8 +579,8 @@ class Handlers
             }
         }
 
-        if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn")|| oSession.host.Contains("fanli.net"))){
-            if (!inArray(filter_hosts, oSession.host)){
+        if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn"))){
+            if (!inArray(filter_hosts, oSession.host) && !inArray(image_hosts, oSession.host) && !findInRequestUrl(oSession.fullUrl, filter_urls)){
                 // oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, 'abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
                 oSession.fullUrl = replaceParam(oSession.fullUrl,"abtest",m_abtest);
             }
