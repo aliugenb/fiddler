@@ -305,24 +305,27 @@ class Handlers
 
     //替换指定参数值
     static function replaceParam(url, paramKey, paramValue){
-        if (url.indexOf("?")>0){
+        if (url.charAt(-1) == "?"){
+            url = url + paramKey + "=" + paramValue;
+        } else if (url.indexOf("?")>0){
             var urlParam = url.substr(url.indexOf("?")+1);
             var beforeUrl = url.substr(0,url.indexOf("?"));
             var nextUrl = "";
+            var arr = new Array();
             if(urlParam!=""){
                 FiddlerObject.log("aaa");
                 var urlParamArr = urlParam.split("&");
                 for(var i=0;i<urlParamArr.length;i++){
                     var paramArr = urlParamArr[i].split("=");
-                    if(paramArr[0] == paramKey){
-                        paramArr[1] = paramValue;
+                    if(paramArr[0] != paramKey){
+                        arr.push(urlParamArr[i]);
                     }
-                    urlParamArr[i] = paramArr.join("=");
                 }
-                nextUrl = "?"+urlParamArr.join("&");
+                arr.push(""+paramKey+"="+paramValue+"");
+                nextUrl = "?"+arr.join("&");
                 url = beforeUrl+nextUrl;
              }
-        }else {
+        }else{
             url = url + "?"+ paramKey+"="+paramValue;
         }
         return url;
@@ -344,6 +347,7 @@ class Handlers
 		}
 		return urlParam;
 	}
+
     public static ContextAction("&Remove Mark")
     function RemoveMark(){
         var fso=new ActiveXObject("Scripting.FileSystemObject");
@@ -562,9 +566,9 @@ class Handlers
             }
         }
 
-        if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.net")|| oSession.host.Contains("shzyfl.cn"))){
+        if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn")|| oSession.host.Contains("fanli.net"))){
             if (!inArray(filter_hosts, oSession.host)){
-            //     oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, 'abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
+                // oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, 'abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
                 oSession.fullUrl = replaceParam(oSession.fullUrl,"abtest",m_abtest);
             }
         }
@@ -1095,6 +1099,7 @@ class Handlers
         }
     }
 }
+
 
 
 
