@@ -148,6 +148,9 @@ class Handlers
 	public static RulesOption("打开304", "打开304")
 	var allow_304: boolean = false;
 
+	public static RulesOption("打开", "打开https")
+	var custom_https: boolean = false;
+
     // Cause Fiddler to delay HTTP traffic to simulate typical 56k modem conditions
     public static RulesOption("Simulate &Modem Speeds", "Per&formance")
     var m_SimulateModem: boolean = false;
@@ -555,14 +558,17 @@ class Handlers
         if ((oSession.uriContains("http://fun.fanli.com/goshop/go")) && (oSession.uriContains("source=override")))  {
             oSession["ui-backcolor"] = "Yellow";
             oSession["ui-customcolumn"] = '高佣api';
-           FiddlerObject.playSound("C:\\windows\\media\\tada.wav");
-           oSession["ui-color"] = "red"; //设置字体颜色，颜色名称
-           oSession["ui-italic"] = "yup"; //设置字体斜体，字符串无所谓
-           oSession["ui-bold"]="QuickExec";	//设置字体加粗，字符串无所谓
-           oSession["ui-backcolor"] = "Lavender";	//设置背景颜色，颜色名称
-             oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓
+            FiddlerObject.playSound("C:\\windows\\media\\tada.wav");
+            oSession["ui-color"] = "red"; //设置字体颜色，颜色名称
+            oSession["ui-italic"] = "yup"; //设置字体斜体，字符串无所谓
+            oSession["ui-bold"]="QuickExec";	//设置字体加粗，字符串无所谓
+            oSession["ui-backcolor"] = "Lavender";	//设置背景颜色，颜色名称
+            oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓
 		}*/
 
+        // if(oSession.uriContains("fanli.com")&& !oSession.isHTTPS){
+        //     oSession["ui-backcolor"] = "yellow";
+        // }
 
         if (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn")){
             var fso=new ActiveXObject("Scripting.FileSystemObject");
@@ -779,15 +785,9 @@ class Handlers
 		// 	oSession.oResponse.headers["Ext"] = "i_id="+i_id+""+";s_id=712";
 		// }
         //修改response header
-        /*if (oSession.fullUrl.Contains("app/v1/resource/bussiness")||
-            oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")||
-            oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")||
-            oSession.fullUrl.Contains("http://fun.fanli.com/api/mobile/getResource")){
-        if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
-        if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
-        if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v2/sf/limitedProductsDetail")){
-        if (oSession.fullUrl.Contains("goshop")){
-            oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fso.m.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
+
+       // if (oSession.fullUrl.Contains("goshop")){
+         /*   oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fso.m.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
             oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F1637718451.html;s_id=544';
             oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fproduct%2F1637718451.html;s_id=544';
             oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fitem.jd.com%2F1637718451.html;s_id=544';
@@ -796,11 +796,10 @@ class Handlers
 			oSession.oResponse.headers.Remove("Cache-Control");
 			oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
             oSession.oResponse.headers.Remove("Last-Modified");
-            oSession.oResponse.headers["Expires"] = 'Mon, 21 Nov 2017 17:28:26 GMT';
-            oSession.oResponse.headers.Remove("Expires");
-            oSession.oResponse.headers["Etag"] = (Math.random()*100).toString();
-            oSession.oResponse.headers.Remove("Etag");
-	    }*/
+            oSession.oResponse.headers["Expires"] = 'Mon, 21 Nov 2017 17:28:26 GMT';*/
+          //  oSession.oResponse.headers.Remove("Ext");
+         //	oSession.oResponse.headers["Ext"] = '';
+	   // }
 
         /*if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
             var responseStringOriginal =  oSession.GetResponseBodyAsString();
@@ -847,27 +846,31 @@ class Handlers
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
             oSession.utilSetResponseBody(responseStringDestinal);
         }*/
-
+		
+		if (custom_https){
+            if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
+                var responseStringOriginal = oSession.GetResponseBodyAsString();
+                var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+                if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
+                    return;
+                }
+                var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+                fanliSwitch = fanliSwitch.replace(/"https":[\d]/, "\"https\":1");
+                responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
+                var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+                oSession.utilSetResponseBody(responseStringDestinal);
+            }
+        }
         if (custom_response){
-			// if (oSession.fullUrl.Contains("key=popmsg")) {
-            // if (oSession.fullUrl.Contains("fun.fanli.com/api/taobao/searchTaobao")) {
-            //if (oSession.fullUrl.Contains("api.v1.search&keyword")) {
-            if (oSession.fullUrl.Contains('fun.fanli.com/goshop/go')) {
+			 if (oSession.fullUrl.Contains("key=popmsg")) {
                 FiddlerObject.log('enter custom');
 			    // 获取Response Body中JSON字符串
 			    var responseStringOriginal =  oSession.GetResponseBodyAsString();
 				FiddlerObject.log(responseStringOriginal);
 			    //转换为可编辑的JSONObject变量
 			    var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-                var custom = responseJSON.JSONObject['data']['genaral']['content'];
-                FiddlerObject.log(custom);
-				//custom = custom.replace(/"load_duration":(\d+)/,"\"load_duration\":10");
-				custom = custom.replace(/"ota":\[.*\]/, "\"ota\":\[544\]");
-				responseJSON.JSONObject['data']['genaral']['content'] = custom;
-                // responseJSON.JSONObject['data']['list_state']= Fiddler.WebFormats.JSON.JsonDecode('1').JSONObject;
-                //responseJSON.JSONObject['data']['sug_pos_index']= Fiddler.WebFormats.JSON.JsonDecode('0').JSONObject;
-	    		// responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*100)+1)).JSONObject.toString();
-			    // responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*1000)+1)).JSONObject;
+	    		responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*100)+1)).JSONObject.toString();
+			    responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*1000)+1)).JSONObject;
 
 			    //重新设置Response Body
 			    var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
@@ -1112,6 +1115,11 @@ class Handlers
         }
     }
 }
+
+
+
+
+
 
 
 
