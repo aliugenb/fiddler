@@ -151,6 +151,9 @@ class Handlers
 	public static RulesOption("打开", "打开https")
 	var custom_https: boolean = false;
 
+    // public static RulesOption("关闭", "关闭https")
+    // var close_https: boolean = false;
+
     // Cause Fiddler to delay HTTP traffic to simulate typical 56k modem conditions
     public static RulesOption("Simulate &Modem Speeds", "Per&formance")
     var m_SimulateModem: boolean = false;
@@ -566,8 +569,33 @@ class Handlers
             oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓
 		}*/
 
-        // if(oSession.uriContains("fanli.com")&& !oSession.isHTTPS){
+        if(oSession.uriContains("key=dynamic")){
+            oSession["ui-customcolumn"] = 'https开关';
+            oSession["ui-backcolor"] = "orange";
+        }
+
+        if(custom_https&& oSession.uriContains("fanli.com")&& !oSession.isHTTPS){
+            oSession["ui-backcolor"] = "yellow";
+        }
+
+        if (/^(?i)http[s]?:\/\/l[\d].(fanli|51fanli).net.*$/.test(oSession.fullUrl)&&oSession.isHTTPS){
+            oSession["ui-backcolor"] = "red";
+        }
+
+        if(!custom_https&& oSession.uriContains("fanli.com")&& oSession.isHTTPS){
+            oSession["ui-backcolor"] = "red";
+        }
+
+        // if(!close_https&& oSession.uriContains("fanli.com")&& !oSession.isHTTPS){
         //     oSession["ui-backcolor"] = "yellow";
+        // }
+
+        // if (/^(?i)http[s]?:\/\/l[\d].(fanli|51fanli).net.*$/.test(oSession.fullUrl)&&oSession.isHTTPS){
+        //     oSession["ui-backcolor"] = "red";
+        // }
+
+        // if(close_https&& oSession.uriContains("fanli.com")&& oSession.isHTTPS){
+        //     oSession["ui-backcolor"] = "red";
         // }
 
         if (oSession.host.Contains("fanli.com")|| oSession.host.Contains("shzyfl.cn")){
@@ -596,17 +624,18 @@ class Handlers
             var path = "Hosts\\" + m_host + ".hosts";
             var hosts = GetHosts(path);
             var original_ip = oSession.m_hostIP;
+            oSession.bypassGateway = true;
             if (!oSession.host.Contains('app.office.fanli.com')) {
                 for (var i = 0; i < hosts.length; i++) {
                     var host = hosts[i].Host
                     var ip = hosts[i].IP
                     if (oSession.HostnameIs(host)) {
-                        oSession["x-overridehost"] = ip;
+                        oSession["x-overrideHostname"] = ip;
                     }
                 }
             }
             if (Handlers.m_image && inArray(image_hosts, oSession.host)){
-                oSession["x-overridehost"] = original_ip;
+                oSession["x-overrideHostname"] = original_ip;
                 oSession["ui-customcolumn"] = '图片已绑定生产';
             }
         }
@@ -833,7 +862,7 @@ class Handlers
                     FiddlerObject.StatusText="已切换至uiwebview";
                     // fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
                 }
-            } else if (oSession.fullUrl.Contains("src=1")){
+                } else if (oSession.fullUrl.Contains("src=1")){
                 if (!uiwebview && webkit){
                     fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
                 }
@@ -848,6 +877,7 @@ class Handlers
         }*/
 		
 		if (custom_https){
+            FiddlerObject.StatusText="https已打开";
             if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
                 var responseStringOriginal = oSession.GetResponseBodyAsString();
                 var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
@@ -860,7 +890,24 @@ class Handlers
                 var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
                 oSession.utilSetResponseBody(responseStringDestinal);
             }
+        }else{
+            FiddlerObject.StatusText="https已关闭";
         }
+
+
+        if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
+                var responseStringOriginal = oSession.GetResponseBodyAsString();
+                var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+                if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
+                    return;
+                }
+                var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+                fanliSwitch = fanliSwitch.replace(/"union_login":(\d+)/, "\"union_login\":3");
+                responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
+                var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+                oSession.utilSetResponseBody(responseStringDestinal);
+        }
+
         if (custom_response){
 			 if (oSession.fullUrl.Contains("key=popmsg")) {
                 FiddlerObject.log('enter custom');
@@ -1115,7 +1162,6 @@ class Handlers
         }
     }
 }
-
 
 
 
