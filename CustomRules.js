@@ -523,8 +523,8 @@ class Handlers
         return abtest_result.toLowerCase();
     }
 
-	//图片hosts
-	public static var image_hosts = new Array("l0.51fanli.net","l1.51fanli.net","l2.51fanli.net","l3.51fanli.net","l4.51fanli.net","i0.51fanli.net","i1.51fanli.net","i2.51fanli.net","i3.51fanli.net","i4.51fanli.net");
+		//图片hosts
+		public static var image_hosts = new Array("l0.51fanli.net","l1.51fanli.net","l2.51fanli.net","l3.51fanli.net","l4.51fanli.net","i0.51fanli.net","i1.51fanli.net","i2.51fanli.net","i3.51fanli.net","i4.51fanli.net");
 
     //不用处理的hosts
     public static var filter_hosts = new Array("trace.fanli.com","app.office.51fanli.com","app.office.fanli.com","appdev.office.51fanli.com","bbs.qa.51fanli.com","mid.qa.51fanli.com","chandao.office.51fanli.com","rbac.fanli.com","rbac.51fanli.com","redis2.51fanli.com","redis2.fanli.com")
