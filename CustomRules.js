@@ -1,4 +1,4 @@
-﻿import System;
+import System;
 import System.Windows.Forms;
 import Fiddler;
 
@@ -521,7 +521,7 @@ class Handlers
 
         return abtest_result.toLowerCase();
     }
-
+    
 	//图片hosts
 	public static var image_hosts = new Array("l0.51fanli.net","l1.51fanli.net","l2.51fanli.net","l3.51fanli.net","l4.51fanli.net","i0.51fanli.net","i1.51fanli.net","i2.51fanli.net","i3.51fanli.net","i4.51fanli.net");
 
@@ -624,7 +624,7 @@ class Handlers
             var path = "Hosts\\" + m_host + ".hosts";
             var hosts = GetHosts(path);
             var original_ip = oSession.m_hostIP;
-            oSession.bypassGateway = true;
+            // oSession.bypassGateway = true;
             if (!oSession.host.Contains('app.office.fanli.com')) {
                 for (var i = 0; i < hosts.length; i++) {
                     var host = hosts[i].Host
