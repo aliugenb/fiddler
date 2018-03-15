@@ -13,7 +13,7 @@ import Fiddler;
 //
 // The original version of this file is named SampleRules.js and it is in the
 // \Program Files\Fiddler\ folder. When Fiddler first runs, it creates a copy named
-// CustomRules.js inside your \Documents\Fiddler2\Scripts folder. If you make a 
+// CustomRules.js inside your \Documents\Fiddler2\Scripts folder. If you make a
 // mistake in editing this file, simply delete the CustomRules.js file and restart
 // Fiddler. A fresh copy of the default rules will be created from the original
 // sample rules file.
@@ -40,12 +40,12 @@ class Handlers
 
 	// The following snippet demonstrates a custom-bound column for the Web Sessions list.
 	// See http://fiddler2.com/r/?fiddlercolumns for more info
-	
+
 	public static BindUIColumn("Method", 60)
 	function FillMethodColumn(oS: Session): String {
 	return oS.RequestMethod;
 	}
-	
+
 
 	// The following snippet demonstrates how to create a custom tab that shows simple text
 	//右侧栏添加tab
@@ -75,7 +75,7 @@ class Handlers
 	// {
 	// Utilities.LaunchHyperlink(sAction);
 	// }
-		
+
 	public static RulesOption("Hide 304s")
 	BindPref("fiddlerscript.rules.Hide304s")
 	var m_Hide304s: boolean = false;
@@ -91,7 +91,7 @@ class Handlers
 
 	// Cause Fiddler to override the User-Agent header with one of the defined values
 	// The page http://browserscope2.org/browse?category=selectors&ua=Mobile%20Safari is a good place to find updated versions of these
-	RulesString("&User-Agents", true) 
+	RulesString("&User-Agents", true)
 	BindPref("fiddlerscript.ephemeral.UserAgentString")
 	RulesStringValue(0,"Netscape &3", "Mozilla/3.0 (Win95; I)")
 	RulesStringValue(1,"WinPhone8.1", "Mozilla/5.0 (Mobile; Windows Phone 8.1; Android 4.0; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 520) like iPhone OS 7_0_3 Mac OS X AppleWebKit/537 (KHTML, like Gecko) Mobile Safari/537")
@@ -136,11 +136,12 @@ class Handlers
 
 	RulesString("SwitchHosts",true)
 	RulesStringValue(0,"外测", "waice")
+	RulesStringValue(0,"外测-29", "waice-29")
 	RulesStringValue(1,"158", "158")
     RulesStringValue(2,"生产", "shengchan")
 	RulesStringValue(3,"custom外测", "custom-waice")
 	RulesStringValue(3,"custom内测", "custom-neice")
-	public static var m_host: String = null;	
+	public static var m_host: String = null;
 
 	public static RulesOption("图片是否绑定生产", "SwitchHosts")
 	var m_image: boolean = false;
@@ -176,15 +177,15 @@ class Handlers
         System.Diagnostics.Process.Start("D:\\Program Files\\Sublime Text 3\\sublime_text.exe", hosts);
     }
 
-    
+
 
     // Force a manual reload of the script file.  Resets all
     // RulesOption variables to their defaults.
     public static ToolsAction("Reset Script")
-    function DoManualReload() { 
+    function DoManualReload() {
         FiddlerObject.ReloadScript();
     }
-	
+
 	// Create a new item on the Tools menu.
 	// public static ToolsAction("&UNTITLED")
 	// function DoUNTITLED(oSessions: Fiddler.Session[]){
@@ -196,7 +197,7 @@ class Handlers
 
 
     public static ContextAction("Open in Browser")
-    function DoOpenInIE(oSessions: Fiddler.Session[]){ 
+    function DoOpenInIE(oSessions: Fiddler.Session[]){
         if (null == oSessions){
             MessageBox.Show("Please choose at least 1 session."); return;
         }
@@ -215,7 +216,7 @@ class Handlers
         }
         UI.actUpdateInspector(true,true);
     }
-    
+
     // public static ContextAction("CopyTimers")
     // function CopyTimers(oSessions: Fiddler.Session[]){
     //     if (null == oSessions){
@@ -286,7 +287,7 @@ class Handlers
         Utilities.CopyToClipboard(ifanli_urls.ToString());
         MessageBox.Show("已复制到剪切板.");
     }
-        
+
     //删除指定key
     static function delParam(url,paramKey){
         var urlParam = url.substr(url.indexOf("?")+1);
@@ -363,7 +364,7 @@ class Handlers
             fso.DeleteFile("markUrls.txt");
         MessageBox.Show("已清除标记的url.");
     }
-        
+
     //选中url标记背景色
     public static ContextAction("Mark")
     function MarkColor(oSessions: Session[]){
@@ -453,7 +454,7 @@ class Handlers
         f.close();
         return hosts_list;
     }
-        
+
     static function trim(str){ //删除左右两端的空格
         return str.replace(/(^\s*)|(\s*$)/g, "");
     }
@@ -521,7 +522,7 @@ class Handlers
 
         return abtest_result.toLowerCase();
     }
-    
+
 	//图片hosts
 	public static var image_hosts = new Array("l0.51fanli.net","l1.51fanli.net","l2.51fanli.net","l3.51fanli.net","l4.51fanli.net","i0.51fanli.net","i1.51fanli.net","i2.51fanli.net","i3.51fanli.net","i4.51fanli.net");
 
@@ -634,7 +635,7 @@ class Handlers
                     }
                 }
             }
-            if (Handlers.m_image && inArray(image_hosts, oSession.host)){
+            if (m_image && inArray(image_hosts, oSession.host)){
                 oSession["x-overrideHostname"] = original_ip;
                 oSession["ui-customcolumn"] = '图片已绑定生产';
             }
@@ -649,12 +650,12 @@ class Handlers
         // }
 
         if ((null != gs_ReplaceToken) && (oSession.url.indexOf(gs_ReplaceToken)>-1)) {   // Case sensitive
-            oSession.url = oSession.url.Replace(gs_ReplaceToken, gs_ReplaceTokenWith); 
+            oSession.url = oSession.url.Replace(gs_ReplaceToken, gs_ReplaceTokenWith);
         }
         if ((null != gs_OverridenHost) && (oSession.host.toLowerCase() == gs_OverridenHost)) {
-            oSession["x-overridehost"] = gs_OverrideHostWith; 
+            oSession["x-overridehost"] = gs_OverrideHostWith;
         }
-		
+
         // if ((null!=bpRequestURI) && oSession.uriContains(bpRequestURI)) {
         //     oSession["x-breakrequest"]="uri";
         // }
@@ -679,9 +680,9 @@ class Handlers
 
         if ((m_SimulateModem)&&(oSession.fullUrl.Contains("app.office.51fanli.com/app/splashvideo.mp4"))) {
             // Delay sends by 300ms per KB uploaded.
-            oSession["request-trickle-delay"] = "3"; 
+            oSession["request-trickle-delay"] = "3";
             // Delay receives by 150ms per KB downloaded.
-            oSession["response-trickle-delay"] = "111770"; 
+            oSession["response-trickle-delay"] = "111770";
         }
 
         if (m_DisableCaching) {
@@ -692,7 +693,7 @@ class Handlers
 
         // User-Agent Overrides
         if (null != sUA) {
-            oSession.oRequest["User-Agent"] = sUA; 
+            oSession.oRequest["User-Agent"] = sUA;
         }
 
         if (m_Japanese) {
@@ -700,11 +701,11 @@ class Handlers
         }
 
         if (m_AutoAuth) {
-            // Automatically respond to any authentication challenges using the 
+            // Automatically respond to any authentication challenges using the
             // current Fiddler user's credentials. You can change (default)
             // to a domain\\username:password string if preferred.
             //
-            // WARNING: This setting poses a security risk if remote 
+            // WARNING: This setting poses a security risk if remote
             // connections are permitted!
             oSession["X-AutoAuth"] = "(default)";
         }
@@ -715,7 +716,7 @@ class Handlers
             oSession.responseCode = 304;
             oSession["ui-backcolor"] = "Lavender";
         }
-        
+
         if (!allow_304 && oSession.host.Contains("fanli")){
             if(oSession.oRequest.headers.Exists("If-None-Match")){
                 oSession.oRequest["If-None-Match"] = 'not304';
@@ -755,7 +756,7 @@ class Handlers
     // been read from the client. This is typically too early to do much useful
     // work, since the body hasn't yet been read, but sometimes it may be useful.
     //
-    // For instance, see 
+    // For instance, see
     // http://blogs.msdn.com/b/fiddler/archive/2011/11/05/http-expect-continue-delays-transmitting-post-bodies-by-up-to-350-milliseconds.aspx
     // for one useful thing you can do with this handler.
     //
@@ -768,14 +769,14 @@ class Handlers
 */
 
     //
-    // If a given session has response streaming enabled, then the OnBeforeResponse function 
+    // If a given session has response streaming enabled, then the OnBeforeResponse function
     // is actually called AFTER the response was returned to the client.
     //
-    // In contrast, this OnPeekAtResponseHeaders function is called before the response headers are 
-    // sent to the client (and before the body is read from the server).  Hence this is an opportune time 
-    // to disable streaming (oSession.bBufferResponse = true) if there is something in the response headers 
+    // In contrast, this OnPeekAtResponseHeaders function is called before the response headers are
+    // sent to the client (and before the body is read from the server).  Hence this is an opportune time
+    // to disable streaming (oSession.bBufferResponse = true) if there is something in the response headers
     // which suggests that tampering with the response body is necessary.
-    // 
+    //
     // Note: oSession.responseBodyBytes is not available within this function!
     //
     static function OnPeekAtResponseHeaders(oSession: Session) {
@@ -789,7 +790,7 @@ class Handlers
             oSession["x-breakresponse"]="status";
             oSession.bBufferResponse = true;
         }
-        
+
         // if ((null!=bpResponseURI) && oSession.uriContains(bpResponseURI)) {
         //     oSession["x-breakresponse"]="uri";
         //     oSession.bBufferResponse = true;
@@ -875,7 +876,7 @@ class Handlers
             var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
             oSession.utilSetResponseBody(responseStringDestinal);
         }*/
-		
+
 		if (custom_https){
             FiddlerObject.StatusText="https已打开";
             if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
@@ -909,11 +910,11 @@ class Handlers
         }
 
         if (custom_response){
-			 if (oSession.fullUrl.Contains("key=popmsg")) {
+			 		if (oSession.fullUrl.Contains("key=popmsg")) {
                 FiddlerObject.log('enter custom');
 			    // 获取Response Body中JSON字符串
 			    var responseStringOriginal =  oSession.GetResponseBodyAsString();
-				FiddlerObject.log(responseStringOriginal);
+					FiddlerObject.log(responseStringOriginal);
 			    //转换为可编辑的JSONObject变量
 			    var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
 	    		responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random()*100)+1)).JSONObject.toString();
@@ -922,9 +923,9 @@ class Handlers
 			    //重新设置Response Body
 			    var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
 			    oSession.utilSetResponseBody(responseStringDestinal);
-		    }
+		    	}
         }
-		
+
 		// 保存response到本地
         /*if (oSession.host.Contains("fanli")) {
             if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
@@ -950,7 +951,7 @@ class Handlers
     }
 
 /*
-    // This function executes just before Fiddler returns an error that it has 
+    // This function executes just before Fiddler returns an error that it has
     // itself generated (e.g. "DNS Lookup failure") to the client application.
     // These responses will not run through the OnBeforeResponse function above.
     static function OnReturningError(oSession: Session) {
@@ -1014,10 +1015,10 @@ class Handlers
         // UI.lvSessions.AddBoundColumn("Server", 50, "@response.server");
 
         // Uncomment to add a global hotkey (Win+G) that invokes the ExecAction method below...
-        // UI.RegisterCustomHotkey(HotkeyModifiers.Windows, Keys.G, "screenshot"); 
+        // UI.RegisterCustomHotkey(HotkeyModifiers.Windows, Keys.G, "screenshot");
     }
 
-    // These static variables are used for simple breakpointing & other QuickExec rules 
+    // These static variables are used for simple breakpointing & other QuickExec rules
     BindPref("fiddlerscript.ephemeral.bpRequestURI")
     public static var bpRequestURI:String = null;
 
@@ -1127,7 +1128,7 @@ class Handlers
             return true;
         case "nuke":
             UI.actClearWinINETCache();
-            UI.actClearWinINETCookies(); 
+            UI.actClearWinINETCookies();
             return true;
         case "screenshot":
             UI.actCaptureScreenshot(false);
@@ -1162,24 +1163,3 @@ class Handlers
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
