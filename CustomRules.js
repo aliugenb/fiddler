@@ -143,8 +143,7 @@ class Handlers {
   RulesStringValue(2, "生产", "shengchan")
   RulesStringValue(3, "custom外测", "custom-waice")
   RulesStringValue(3, "custom内测", "custom-neice")
-  public static
-  var m_host: String = null;
+  public static var m_host: String = null;
 
   public static RulesOption("图片是否绑定生产", "SwitchHosts")
   var m_image: boolean = false;
@@ -393,8 +392,7 @@ class Handlers {
     mark_txt.close();
   }
 
-  static
-  function getDay() {
+  static function getDay() {
     var date = new Date();
     var seperator = "-";
     var month = date.getMonth() + 1;
@@ -403,8 +401,7 @@ class Handlers {
     return day;
   }
 
-  static
-  function getCurTime() {
+  static function getCurTime() {
     var date = new Date();
     var seperator1 = "-";
     var seperator2 = ":";
@@ -422,8 +419,7 @@ class Handlers {
     return curTime;
   }
 
-  static
-  function createFolder() {
+  static function createFolder() {
     //文件保存路径，可自定义
     var parFolder = "D:\\Fiddler Sessions";
     var folder = "D:\\Fiddler Sessions\\" + getDay() + "\\";
@@ -437,8 +433,7 @@ class Handlers {
     return folder;
   }
 
-  static
-  function GetHosts(path) {
+  static function GetHosts(path) {
     var fso = new ActiveXObject("Scripting.FileSystemObject");
     if (!fso.FileExists(path)) {
       MessageBox.Show("Hosts文件不存在");
@@ -472,23 +467,18 @@ class Handlers {
     return hosts_list;
   }
 
-  static
-  function trim(str) { //删除左右两端的空格
+  static function trim(str) { //删除左右两端的空格
     return str.replace(/(^\s*)|(\s*$)/g, "");
   }
-  static
-  function ltrim(str) { //删除左边的空格
+  static function ltrim(str) { //删除左边的空格
     return str.replace(/(^\s*)/g, "");
   }
-  static
-  function rtrim(str) { //删除右边的空格
+  static function rtrim(str) { //删除右边的空格
     return str.replace(/(\s*$)/g, "");
   }
 
-  public static
-  var m_abtest: String = null;
-  static
-  function getAbtest(str) {
+  public static var m_abtest: String = null;
+  static function getAbtest(str) {
     var parts = str.split("-");
     if (null == parts) {
       MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
@@ -547,19 +537,15 @@ class Handlers {
   }
 
   //图片hosts
-  public static
-  var image_hosts = new Array("l0.51fanli.net", "l1.51fanli.net", "l2.51fanli.net", "l3.51fanli.net", "l4.51fanli.net", "i0.51fanli.net", "i1.51fanli.net", "i2.51fanli.net", "i3.51fanli.net", "i4.51fanli.net");
+  public static var image_hosts = new Array("l0.51fanli.net", "l1.51fanli.net", "l2.51fanli.net", "l3.51fanli.net", "l4.51fanli.net", "i0.51fanli.net", "i1.51fanli.net", "i2.51fanli.net", "i3.51fanli.net", "i4.51fanli.net");
 
   //不用处理的hosts
-  public static
-  var filter_hosts = new Array("trace.fanli.com", "app.office.51fanli.com", "app.office.fanli.com", "appdev.office.51fanli.com", "bbs.qa.51fanli.com", "mid.qa.51fanli.com", "chandao.office.51fanli.com", "rbac.fanli.com", "rbac.51fanli.com", "redis2.51fanli.com", "redis2.fanli.com")
+  public static var filter_hosts = new Array("trace.fanli.com", "app.office.51fanli.com", "app.office.fanli.com", "appdev.office.51fanli.com", "bbs.qa.51fanli.com", "mid.qa.51fanli.com", "chandao.office.51fanli.com", "rbac.fanli.com", "rbac.51fanli.com", "redis2.51fanli.com", "redis2.fanli.com")
 
   //不用处理的链接
-  public static
-  var filter_urls = new Array("http://super.fanli.com/api/app/");
+  public static var filter_urls = new Array("http://super.fanli.com/api/app/");
 
-  static
-  function inArray(arr, str) {
+  static function inArray(arr, str) {
     var i = arr.length;
     while (i--) {
       if (arr[i] === str) {
@@ -569,8 +555,7 @@ class Handlers {
     return false;
   }
 
-  static
-  function findInRequestUrl(url, arr) {
+  static function findInRequestUrl(url, arr) {
     var i = arr.length;
     while (i--) {
       if (url.indexOf(arr[i]) >= 0) {
@@ -580,8 +565,7 @@ class Handlers {
     return false;
   }
 
-  static
-  function OnBeforeRequest(oSession: Session) {
+  static function OnBeforeRequest(oSession: Session) {
     // Sample Rule: Color ASPX requests in RED
     if (oSession.responseCode == 404) {
       FiddlerObject.playSound("C:\\windows\\media\\tada.wav");
@@ -807,8 +791,7 @@ class Handlers {
   //
   // Note: oSession.responseBodyBytes is not available within this function!
   //
-  static
-  function OnPeekAtResponseHeaders(oSession: Session) {
+  static function OnPeekAtResponseHeaders(oSession: Session) {
     //FiddlerApplication.Log.LogFormat("Session {0}: Response header peek shows status is {1}", oSession.id, oSession.responseCode);
     if (m_DisableCaching) {
       oSession.oResponse.headers.Remove("Expires");
@@ -835,8 +818,7 @@ class Handlers {
   }
 
 
-  static
-  function OnBeforeResponse(oSession: Session) {
+  static function OnBeforeResponse(oSession: Session) {
     if (m_Hide304s && oSession.responseCode == 304) {
       oSession["ui-hide"] = "true";
     }
@@ -924,7 +906,6 @@ class Handlers {
     } else {
       FiddlerObject.StatusText = "https已关闭";
     }
-
 
     if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
       var responseStringOriginal = oSession.GetResponseBodyAsString();
@@ -1035,8 +1016,7 @@ class Handlers {
   */
 
   // The Main() function runs everytime your FiddlerScript compiles
-  static
-  function Main() {
+  static function Main() {
     var today: Date = new Date();
     FiddlerObject.StatusText = " CustomRules.js was loaded at: " + today;
     FiddlerObject.UI.lvSessions.AddBoundColumn("Server IP", 100, "X-HostIP");
@@ -1051,34 +1031,24 @@ class Handlers {
 
   // These static variables are used for simple breakpointing & other QuickExec rules
   BindPref("fiddlerscript.ephemeral.bpRequestURI")
-  public static
-  var bpRequestURI: String = null;
+  public static var bpRequestURI: String = null;
 
   BindPref("fiddlerscript.ephemeral.bpResponseURI")
-  public static
-  var bpResponseURI: String = null;
+  public static var bpResponseURI: String = null;
 
   BindPref("fiddlerscript.ephemeral.bpMethod")
-  public static
-  var bpMethod: String = null;
+  public static var bpMethod: String = null;
 
-  static
-  var bpStatus: int = -1;
-  static
-  var uiBoldURI: String = null;
-  static
-  var gs_ReplaceToken: String = null;
-  static
-  var gs_ReplaceTokenWith: String = null;
-  static
-  var gs_OverridenHost: String = null;
-  static
-  var gs_OverrideHostWith: String = null;
+  static var bpStatus: int = -1;
+  static var uiBoldURI: String = null;
+  static var gs_ReplaceToken: String = null;
+  static var gs_ReplaceTokenWith: String = null;
+  static var gs_OverridenHost: String = null;
+  static var gs_OverrideHostWith: String = null;
 
   // The OnExecAction function is called by either the QuickExec box in the Fiddler window,
   // or by the ExecAction.exe command line utility.
-  static
-  function OnExecAction(sParams: String[]): Boolean {
+  static function OnExecAction(sParams: String[]): Boolean {
 
     FiddlerObject.StatusText = "ExecAction: " + sParams[0];
 
