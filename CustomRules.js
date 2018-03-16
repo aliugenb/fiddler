@@ -119,13 +119,11 @@ class Handlers {
   RulesStringValue(23, "GoogleBot Crawler", "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
   RulesStringValue(24, "Kindle Fire (Silk)", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_3; en-us; Silk/1.0.22.79_10013310) AppleWebKit/533.16 (KHTML, like Gecko) Version/5.0 Safari/533.16 Silk-Accelerated=true")
   RulesStringValue(25, "&Custom...", "%CUSTOM%")
-  public static
-  var sUA: String = null;
+  public static var sUA: String = null;
 
   RulesString("Custom Response", true)
   RulesStringValue(0, "打开", "1")
-  public static
-  var custom_response: String = null;
+  public static var custom_response: String = null;
 
   // public static RulesOption("切换xwalk", "切换浏览器内核")
   // var xwalk: boolean = false;
