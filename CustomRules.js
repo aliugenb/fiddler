@@ -41,7 +41,6 @@ class Handlers {
   // See http://fiddler2.com/r/?fiddlercolumns for more info
 
   public static BindUIColumn("Method", 60)
-
   function FillMethodColumn(oS: Session): String {
     return oS.RequestMethod;
   }
@@ -149,7 +148,7 @@ class Handlers {
   public static RulesOption("打开304", "打开304")
   var allow_304: boolean = false;
 
-  public static RulesOption("打开", "打开https")
+  public static RulesOption("关闭", "关闭https")
   var custom_https: boolean = false;
 
   // public static RulesOption("关闭", "关闭https")
@@ -166,10 +165,7 @@ class Handlers {
   public static RulesOption("Cache Always &Fresh", "Per&formance")
   var m_AlwaysFresh: boolean = false;
 
-
-
   public static ToolsAction("&Edit Hosts")
-
   function EditHosts() {
     var hosts = "hosts\\shengchan.hosts";
     if (m_host) {
@@ -178,12 +174,9 @@ class Handlers {
     System.Diagnostics.Process.Start("D:\\Program Files\\Sublime Text 3\\sublime_text.exe", hosts);
   }
 
-
-
   // Force a manual reload of the script file.  Resets all
   // RulesOption variables to their defaults.
   public static ToolsAction("Reset Script")
-
   function DoManualReload() {
     FiddlerObject.ReloadScript();
   }
@@ -196,10 +189,7 @@ class Handlers {
   // 	MessageBox.Show(FiddlerObject.prompt("aaa","bbb","ccc"));
   // }
 
-
-
   public static ContextAction("Open in Browser")
-
   function DoOpenInIE(oSessions: Fiddler.Session[]) {
     if (null == oSessions) {
       MessageBox.Show("Please choose at least 1 session.");
@@ -211,9 +201,7 @@ class Handlers {
     }
   }
 
-
   public static ContextAction("Decode Selected Sessions")
-
   function DoRemoveEncoding(oSessions: Session[]) {
     for (var x: int = 0; x < oSessions.Length; x++) {
       oSessions[x].utilDecodeRequest();
@@ -248,7 +236,6 @@ class Handlers {
   //bpafter url
   public static var bpResponseURIs = new Array();
   public static ContextAction("bpa")
-
   function bpaUrl(oSessions: Session[]) {
     if (null == oSessions) {
       MessageBox.Show("Please select sessions to copy timers for.", "Nothing to Do");
@@ -264,7 +251,6 @@ class Handlers {
   //bpu url
   public static var bpRequestURIs = new Array();
   public static ContextAction("bpu")
-
   function bpuUrl(oSessions: Session[]) {
     if (null == oSessions) {
       MessageBox.Show("Please select sessions to copy timers for.", "Nothing to Do");
@@ -279,7 +265,6 @@ class Handlers {
 
   //添加转换成ifanli链接
   public static ContextAction("To Ifanli")
-
   function ToIfanli(oSessions: Session[]) {
     if (null == oSessions) {
       MessageBox.Show("Please select sessions to copy timers for.", "Nothing to Do");
@@ -364,7 +349,6 @@ class Handlers {
   }
 
   public static ContextAction("&Remove Mark")
-
   function RemoveMark() {
     var fso = new ActiveXObject("Scripting.FileSystemObject");
     if (!fso.FileExists("markUrls.txt"))
@@ -376,7 +360,6 @@ class Handlers {
 
   //选中url标记背景色
   public static ContextAction("Mark")
-
   function MarkColor(oSessions: Session[]) {
     var mark_txt = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile("markUrls.txt", 8, true, true);
     if (null == oSessions) {
@@ -584,18 +567,6 @@ class Handlers {
     if (oSession.uriContains("key=dynamic")) {
       oSession["ui-customcolumn"] = 'https开关';
       oSession["ui-backcolor"] = "orange";
-    }
-
-    if (custom_https && oSession.uriContains("fanli.com") && !oSession.isHTTPS) {
-      oSession["ui-backcolor"] = "yellow";
-    }
-
-    if (/^(?i)http[s]?:\/\/l[\d].(fanli|51fanli).net.*$/.test(oSession.fullUrl) && oSession.isHTTPS) {
-      oSession["ui-backcolor"] = "red";
-    }
-
-    if (!custom_https && oSession.uriContains("fanli.com") && oSession.isHTTPS) {
-      oSession["ui-backcolor"] = "red";
     }
 
     // if(!close_https&& oSession.uriContains("fanli.com")&& !oSession.isHTTPS){
@@ -888,7 +859,7 @@ class Handlers {
     }*/
 
     if (custom_https) {
-      FiddlerObject.StatusText = "https已打开";
+      FiddlerObject.StatusText = "https已关闭";
       if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
         var responseStringOriginal = oSession.GetResponseBodyAsString();
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
@@ -896,39 +867,39 @@ class Handlers {
           return;
         }
         var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-        fanliSwitch = fanliSwitch.replace(/"https":[\d]/, "\"https\":1");
+        fanliSwitch = fanliSwitch.replace(/"https":[\d]/, "\"https\":0");
         responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
         oSession.utilSetResponseBody(responseStringDestinal);
       }
     } else {
-      FiddlerObject.StatusText = "https已关闭";
-    }
-
-    if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
-      var responseStringOriginal = oSession.GetResponseBodyAsString();
-      var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-      if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
-        return;
-      }
-      var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-      fanliSwitch = fanliSwitch.replace(/"union_login":(\d+)/, "\"union_login\":3");
-      responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
-      var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
-      oSession.utilSetResponseBody(responseStringDestinal);
+      FiddlerObject.StatusText = "https已打开";
     }
 
     if (custom_response) {
+      //getResource接口switch节点
+      // if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
+      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
+      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+      //   if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
+      //     return;
+      //   }
+      //   var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+      //   fanliSwitch = fanliSwitch.replace(/"union_login":(\d+)/, "\"union_login\":15");
+      //   responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
+      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+      //   oSession.utilSetResponseBody(responseStringDestinal);
+      // }
+
+      //超级返首页popmsg
       if (oSession.fullUrl.Contains("key=popmsg")) {
         FiddlerObject.log('enter custom');
         // 获取Response Body中JSON字符串
         var responseStringOriginal = oSession.GetResponseBodyAsString();
-        FiddlerObject.log(responseStringOriginal);
         //转换为可编辑的JSONObject变量
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
         responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 100) + 1)).JSONObject.toString();
         responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 1000) + 1)).JSONObject;
-
         //重新设置Response Body
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
         oSession.utilSetResponseBody(responseStringDestinal);
