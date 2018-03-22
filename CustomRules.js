@@ -142,17 +142,16 @@ class Handlers {
   RulesStringValue(3, "custom内测", "custom-neice")
   public static var m_host: String = null;
 
+  RulesString("Https", true)
+  RulesStringValue(0, "打开", "1")
+  RulesStringValue(0, "关闭", "0")
+  public static var custom_https: String = null;
+
   public static RulesOption("图片是否绑定生产", "SwitchHosts")
   var m_image: boolean = false;
 
   public static RulesOption("打开304", "打开304")
   var allow_304: boolean = false;
-
-  public static RulesOption("关闭", "关闭https")
-  var custom_https: boolean = false;
-
-  // public static RulesOption("关闭", "关闭https")
-  // var close_https: boolean = false;
 
   // Cause Fiddler to delay HTTP traffic to simulate typical 56k modem conditions
   public static RulesOption("Simulate &Modem Speeds", "Per&formance")
@@ -859,7 +858,6 @@ class Handlers {
     }*/
 
     if (custom_https) {
-      FiddlerObject.StatusText = "https已关闭";
       if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
         var responseStringOriginal = oSession.GetResponseBodyAsString();
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
@@ -867,13 +865,17 @@ class Handlers {
           return;
         }
         var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-        fanliSwitch = fanliSwitch.replace(/"https":[\d]/, "\"https\":0");
+        if (custom_https==1){
+          fanliSwitch = fanliSwitch.replace(/"https":(\d*)/, "\"https\":1");
+          FiddlerObject.StatusText = "https已打开";
+        }else if(custom_https==0){
+          fanliSwitch = fanliSwitch.replace(/"https":(\d*)/, "\"https\":0");
+          FiddlerObject.StatusText = "https已关闭";
+        }
         responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
         oSession.utilSetResponseBody(responseStringDestinal);
       }
-    } else {
-      FiddlerObject.StatusText = "https已打开";
     }
 
     if (custom_response) {
@@ -885,7 +887,7 @@ class Handlers {
       //     return;
       //   }
       //   var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-      //   fanliSwitch = fanliSwitch.replace(/"union_login":(\d+)/, "\"union_login\":15");
+      //   fanliSwitch = fanliSwitch.replace(/"union_login":(\d*)/, "\"union_login\":15");
       //   responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
       //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
       //   oSession.utilSetResponseBody(responseStringDestinal);
