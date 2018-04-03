@@ -1,4 +1,4 @@
-import System;
+﻿import System;
 import System.Windows.Forms;
 import Fiddler;
 
@@ -312,7 +312,6 @@ class Handlers {
       var nextUrl = "";
       var arr = new Array();
       if (urlParam != "") {
-        FiddlerObject.log("aaa");
         var urlParamArr = urlParam.split("&");
         for (var i = 0; i < urlParamArr.length; i++) {
           var paramArr = urlParamArr[i].split("=");
@@ -595,9 +594,8 @@ class Handlers {
       }
     }
 
-    if (null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com") || oSession.host.Contains("shzyfl.cn"))) {
+    if (!oSession.isTunnel && null != m_abtest && !oSession.oRequest.headers.Exists("custom_abtest") && (oSession.host.Contains("fanli.com") || oSession.host.Contains("shzyfl.cn"))) {
       if (!inArray(filter_hosts, oSession.host) && !inArray(image_hosts, oSession.host) && !findInRequestUrl(oSession.fullUrl, filter_urls)) {
-        // oSession.fullUrl = oSession.fullUrl.Contains('abtest=')?oSession.fullUrl.replace(/abtest=[^&]*/, 'abtest='+m_abtest):oSession.fullUrl+'&abtest='+m_abtest;
         oSession.fullUrl = replaceParam(oSession.fullUrl, "abtest", m_abtest);
       }
     }
@@ -880,32 +878,33 @@ class Handlers {
 
     if (custom_response) {
       //getResource接口switch节点
-      // if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
-      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
-      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-      //   if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
-      //     return;
-      //   }
-      //   var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-      //   fanliSwitch = fanliSwitch.replace(/"union_login":(\d*)/, "\"union_login\":15");
-      //   responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
-      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
-      //   oSession.utilSetResponseBody(responseStringDestinal);
-      // }
-
-      //超级返首页popmsg
-      if (oSession.fullUrl.Contains("key=popmsg")) {
-        FiddlerObject.log('enter custom');
-        // 获取Response Body中JSON字符串
+      if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
         var responseStringOriginal = oSession.GetResponseBodyAsString();
-        //转换为可编辑的JSONObject变量
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-        responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 100) + 1)).JSONObject.toString();
-        responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 1000) + 1)).JSONObject;
-        //重新设置Response Body
+        if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
+          return;
+        }
+        var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+        //添加不存在的节点
+        fanliSwitch = fanliSwitch.replace(/\}$/, ",\"goshop_https\":1}");
+        //替换存在的节点
+        // fanliSwitch = fanliSwitch.replace(/"union_login":(\d*)/, "\"union_login\":15");
+        responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
+
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
         oSession.utilSetResponseBody(responseStringDestinal);
       }
+
+      //超级返首页popmsg
+      // if (oSession.fullUrl.Contains("key=popmsg")) {
+      //   FiddlerObject.log('enter custom');
+      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
+      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+      //   responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 100) + 1)).JSONObject.toString();
+      //   responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 1000) + 1)).JSONObject;
+      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+      //   oSession.utilSetResponseBody(responseStringDestinal);
+      // }
     }
 
     // 保存response到本地
