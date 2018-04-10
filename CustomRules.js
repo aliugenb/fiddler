@@ -164,6 +164,9 @@ class Handlers {
   public static RulesOption("Cache Always &Fresh", "Per&formance")
   var m_AlwaysFresh: boolean = false;
 
+  public static RulesOption("显示", "显示MC")
+  var m_mc: boolean = true;
+
   public static ToolsAction("&Edit Hosts")
   function EditHosts() {
     var hosts = "hosts\\shengchan.hosts";
@@ -412,6 +415,39 @@ class Handlers {
     return folder;
   }
 
+  // 分别存储android和ios的mc数据
+  public static var android_mc = new Array();
+  public static var ios_mc = new Array();
+  static function getMcData(){
+    var fso = new ActiveXObject("Scripting.FileSystemObject");
+    if (!fso.FileExists("mcdata.txt")) {
+      MessageBox.Show("mc文件不存在");
+      return;
+    }
+    var mc_data = "";
+    var f = fso.OpenTextFile("mcdata.txt", 1, false, -1);
+    while (!f.AtEndOfStream) {
+      var read_mc = trim(f.readline());
+      mc_data = mc_data + read_mc;
+      }
+    f.close();
+    var mc_json = Fiddler.WebFormats.JSON.JsonDecode(mc_data);
+    var ios_json = mc_json.JSONObject[0].Item("channels");
+    var android_json = mc_json.JSONObject[1].Item("channels");
+    for(var i=0;i<ios_json.Count;i++){
+      var mc = {};
+      mc.id = ios_json[i].Item("id");
+      mc.name = ios_json[i].Item("name");
+      ios_mc.push(mc);
+    }
+    for(var j=0;j<android_json.Count;j++){
+      var mc = {};
+      mc.id = android_json[j].Item("id");
+      mc.name = android_json[j].Item("name");
+      android_mc.push(mc);
+    }
+  }
+
   static function GetHosts(path) {
     var fso = new ActiveXObject("Scripting.FileSystemObject");
     if (!fso.FileExists(path)) {
@@ -561,6 +597,18 @@ class Handlers {
             oSession["ui-backcolor"] = "Lavender";	//设置背景颜色，颜色名称
             oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓
 		}*/
+
+    if(m_mc && !oSession.isTunnel && oSession.uriContains("passport.fanli.com/mobileapi/i/device/update")){
+      var os = getParam(oSession.fullUrl, "c_src").Value;
+      var mc = getParam(oSession.fullUrl, "mc").Value;
+      if(os==2){
+        for(var i=0;i<android_mc.length;i++){
+          if(mc==android_mc[i].id){
+            MessageBox.Show("当前渠道号:\n"+android_mc[i].name);
+          }
+        }
+      }
+    }
 
     if (oSession.uriContains("key=dynamic")) {
       oSession["ui-customcolumn"] = 'https开关';
@@ -946,10 +994,9 @@ class Handlers {
       static function OnDone(oSession: Session) {
       }
   */
-  /*
-      public static var hosts_env = new  Array('waice','158','custom','shengchan');
-      static function OnBoot() {
 
+      static function OnBoot() {
+          getMcData();
           // MessageBox.Show("Fiddler has finished booting");
           // System.Diagnostics.Process.Start("iexplore.exe");
           //
@@ -957,7 +1004,6 @@ class Handlers {
           // UI.ActivateResponseInspector("HEADERS");
       }
 
-  */
   /*
   static function OnBeforeShutdown(): Boolean {
       // Return false to cancel shutdown.
