@@ -8,7 +8,7 @@
 
 2. Hosts文件夹内添加.hosts文件（或者复制swihost工具下hosts文件）
 需保证.hosts文件与CustomRules.js中（下图红框内）命名一致
-![](https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost2.png)
+![](https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost2.png)<br>
 ![](https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost3.png)
 
 3. 修改CustomRules.js下图红框内容，路径改成自己喜欢用的编辑器（注意用\\\）
@@ -21,3 +21,4 @@
 选中外测或者其他测试环境后，再勾选“图片是否绑生产”，会使用生产图片（只对i1、I1这种类型开头的图片链接有效）<br>
 `使用fiddler切换hosts之前，先用之前SwitchHosts工具将本机的hosts切到生产`<br>
 如果host不够用，自己可以添加，格式如RulesStringValue({int},”xxxx” ,”xxxx”)，参考步骤2中的截图，切记文件命名要一致
+![](https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost5.png)
