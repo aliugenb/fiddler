@@ -18,6 +18,6 @@
 4. 我的文档-Fiddler2-Scripts文件夹下替换CustomRules.js文件
 5. 打开Fiddler，点击Rules-SwitchHosts
 其中选中Disabled，即切换到生产环境
-选中外测或者其他测试环境后，再勾选“图片是否绑生产”，会使用生产图片（只对i1、I1这种类型开头的图片链接有效）
-`使用fiddler切换hosts之前，先用之前SwitchHosts工具将本机的hosts切到生产`
+选中外测或者其他测试环境后，再勾选“图片是否绑生产”，会使用生产图片（只对i1、I1这种类型开头的图片链接有效）</br>
+`使用fiddler切换hosts之前，先用之前SwitchHosts工具将本机的hosts切到生产`</br>
 如果host不够用，自己可以添加，格式如RulesStringValue({int},”xxxx” ,”xxxx”)，参考步骤2中的截图，切记文件命名要一致
