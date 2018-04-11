@@ -1,4 +1,3 @@
-Fiddler说明
-==========
-功能
-----------
+#FiddlerScript说明
+##FiddlerScript几个主要方法
+1.

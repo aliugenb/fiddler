@@ -2,7 +2,7 @@
 ## 目前支持的功能：
 切换host、自定义abtest参数、显示MC渠道名、https开关
 ### 一、SwitchHost功能
-#### 步骤：
+#### 使用方法：
 1.	在fiddler工具的安装路径下新建Hosts文件夹
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/swithhost1.png" width="420" height="120"  />
 
@@ -16,6 +16,7 @@
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost4.png" width="420" height="100"  />
 
 4. 我的文档-Fiddler2-Scripts文件夹下替换CustomRules.js文件
+
 5. 打开Fiddler，点击Rules-SwitchHosts
 其中选中Disabled，即切换到生产环境
 选中外测或者其他测试环境后，再勾选“图片是否绑生产”，会使用生产图片（只对i1、I1这种类型开头的图片链接有效）<br>
@@ -26,3 +27,8 @@
 6. Fiddler点击Tool-EditHosts可编辑当前选中的hosts
 如果选中的是Disabled，会编辑生产hosts
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost6.png" width="300" height="250"  />
+
+### 二、自定义abtest参数
+#### 使用方法：
+1. Fiddler命令行输入:`abtest 24450_b-22312_b-39103_b`
+<img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/abtest/abtest.png" width="284" height="54"  />
