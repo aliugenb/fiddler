@@ -25,4 +25,4 @@
 
 6. Fiddler点击Tool-EditHosts可编辑当前选中的hosts
 如果选中的是Disabled，会编辑生产hosts
-<img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost6.png" width = "80%" />
+<img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost6.png" width="150" height="150"  />
