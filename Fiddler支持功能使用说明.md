@@ -11,7 +11,7 @@
 ![](https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost2.png)
 ![](https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost3.png)
 
-3. 修改CustomRules.js下图红框内容，路径改成自己喜欢用的编辑器（注意用\\）
+3. 修改CustomRules.js下图红框内容，路径改成自己喜欢用的编辑器（注意用\\\）
 或者删除变成System.Diagnostics.Process.Start(hosts);
 ![](https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost4.png)
 
@@ -19,5 +19,5 @@
 5. 打开Fiddler，点击Rules-SwitchHosts
 其中选中Disabled，即切换到生产环境
 选中外测或者其他测试环境后，再勾选“图片是否绑生产”，会使用生产图片（只对i1、I1这种类型开头的图片链接有效）
-<font color=#FF6A6A size=3 face="黑体">使用fiddler切换hosts之前，先用之前SwitchHosts工具将本机的hosts切到生产</font>  
+`使用fiddler切换hosts之前，先用之前SwitchHosts工具将本机的hosts切到生产`
 如果host不够用，自己可以添加，格式如RulesStringValue({int},”xxxx” ,”xxxx”)，参考步骤2中的截图，切记文件命名要一致
