@@ -1003,9 +1003,6 @@ class Handlers {
 
       static function OnBoot() {
           getMcData();
-          var url = "http://l3.51fanli.net/app/images/2017/08/59967e46962ff.png?";
-          url = replaceParam(url,"aaa","bbb");
-          FiddlerObject.log(url);
           // MessageBox.Show("Fiddler has finished booting");
           // System.Diagnostics.Process.Start("iexplore.exe");
           //
