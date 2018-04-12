@@ -35,9 +35,9 @@
 
 2. 输入后请求gw.appAbtest.getTestInfoByStoryid接口
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/abtest/abtest1.png"/><br>
-如果接口返回报错或者无数据，fiddler弹出提示框
+如果接口返回报错或者无数据，fiddler弹出提示框<br>
 如果接口返回正确，会获取到需求号对应的testid，并在接下来的fanli请求都会替换abtest参数值(无abtest参数会添加参数)<br>
-`不想添加abtest参数的host，可以在filter_hosts和image_hosts添加；不想添加的url，可以添加在filter_urls，格式可以参考已有内容`
+`不想替换abtest参数的host，可以在filter_hosts和image_hosts添加；不想替换的url，可以添加在filter_urls，格式可以参考已有内容`
 
 3. 关闭此功能，可以重启fiddler，或者命令行输入abtest即可
 
@@ -78,6 +78,6 @@
 #### * 打开304功能
 1. Fiddler菜单栏--Rules--打开304
 
-2.选中后，app的请求都会支持304功能(`前提是服务端支持`)；<br>
+2. 选中后，app的请求都会支持304功能(`前提是服务端支持`)；<br>
 未选中情况下，app的请求不会返回304<br>
 如果想默认情况下支持304功能，代码内搜索allow_304参数，将其改为true即可
