@@ -34,7 +34,7 @@
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/abtest/abtest.png" width="284" height="54"  />
 
 2. 输入后请求gw.appAbtest.getTestInfoByStoryid接口
-<img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/abtest/abtest1.png"/><br>
+<img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/abtest/abtest1.png"/>
 如果接口返回报错或者无数据，fiddler弹出提示框<br>
 如果接口返回正确，会获取到需求号对应的testid，并在接下来的fanli请求都会替换abtest参数值(无abtest参数会添加参数)<br>
 `不想替换abtest参数的host，可以在filter_hosts和image_hosts添加；不想替换的url，可以添加在filter_urls，格式可以参考已有内容`
