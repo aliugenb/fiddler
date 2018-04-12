@@ -127,11 +127,11 @@ class Handlers {
   // public static RulesOption("切换xwalk", "切换浏览器内核")
   // var xwalk: boolean = false;
   //
-  // public static RulesOption("切换webkit", "切换浏览器内核")
-  // var webkit: boolean = false;
-  //
-  // public static RulesOption("恢复uiwebview", "切换浏览器内核")
-  // var uiwebview: boolean = false;
+  public static RulesOption("切换webkit", "切换浏览器内核")
+  var webkit: boolean = false;
+
+  public static RulesOption("恢复uiwebview", "切换浏览器内核")
+  var uiwebview: boolean = false;
 
   RulesString("SwitchHosts", true)
   RulesStringValue(0, "外测", "waice")
@@ -142,13 +142,13 @@ class Handlers {
   RulesStringValue(3, "custom内测", "custom-neice")
   public static var m_host: String = null;
 
+  public static RulesOption("图片是否绑定生产", "SwitchHosts")
+  var m_image: boolean = false;
+
   RulesString("Https", true)
   RulesStringValue(0, "打开", "1")
   RulesStringValue(0, "关闭", "0")
   public static var custom_https: String = null;
-
-  public static RulesOption("图片是否绑定生产", "SwitchHosts")
-  var m_image: boolean = false;
 
   public static RulesOption("打开304", "打开304")
   var allow_304: boolean = false;
@@ -165,7 +165,7 @@ class Handlers {
   var m_AlwaysFresh: boolean = false;
 
   public static RulesOption("显示", "显示MC")
-  var m_mc: boolean = true;
+  var m_mc: boolean = false;
 
   public static ToolsAction("&Edit Hosts")
   function EditHosts() {
@@ -276,8 +276,9 @@ class Handlers {
     var ifanli_urls: System.Text.StringBuilder = new System.Text.StringBuilder();
     for (var x = 0; x < oSessions.Length; x++) {
       var original_url = delParam(oSessions[x].fullUrl, "abtest");
+      FiddlerObject.log(original_url);
       var ifanli_url = ifanli + encodeURIComponent(original_url);
-      ifanli_urls.AppendFormat("{0}\r", ifanli_url);
+      ifanli_urls.AppendFormat("{0}\r",ifanli_url);
     }
     Utilities.CopyToClipboard(ifanli_urls.ToString());
     MessageBox.Show("已复制到剪切板.");
@@ -285,6 +286,9 @@ class Handlers {
 
   //删除指定key
   static function delParam(url, paramKey) {
+    if(url.indexOf("?")==-1){
+      return url;
+    }
     var urlParam = url.substr(url.indexOf("?") + 1);
     var beforeUrl = url.substr(0, url.indexOf("?"));
     var nextUrl = "";
@@ -307,7 +311,7 @@ class Handlers {
 
   //替换指定参数值
   static function replaceParam(url, paramKey, paramValue) {
-    if (url.charAt(-1) == "?") {
+    if (url.charAt(url.length-1) == "?") {
       url = url + paramKey + "=" + paramValue;
     } else if (url.indexOf("?") > 0) {
       var urlParam = url.substr(url.indexOf("?") + 1);
@@ -662,6 +666,7 @@ class Handlers {
           }
         }
       }
+            FiddlerObject.log(m_image);
       if (m_image && inArray(image_hosts, oSession.host)) {
         oSession["x-overrideHostname"] = original_ip;
         oSession["ui-customcolumn"] = '图片已绑定生产';
@@ -857,39 +862,40 @@ class Handlers {
     //	oSession.oResponse.headers["Ext"] = '';
     // }
 
-    /*if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=common.*$/.test(oSession.fullUrl)){
+    if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=dynamic.*$/.test(oSession.fullUrl)){
         var responseStringOriginal =  oSession.GetResponseBodyAsString();
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
         if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')){
             return;
         }
         var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-        if (oSession.fullUrl.Contains("src=2")){
-            //Android内置默认白名单
-            // var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
-            //当前请求的设备
-            var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
-            //接口未返回browser_rule节点时，写入默认内容
-            var content = "{}";
-            var updatetime = new System.Collections.Hashtable();
-            if (!responseJSON.JSONObject['data'].ContainsKey('browser_rule')){
-                updatetime.Add('updatetime', ""+new Date().getTime()+"");
-                responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
-                responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
-            }
-            if (!uiwebview && xwalk){
-                content = "{\"device_white_list\":[\""+device+"\"]}";
-                responseJSON.JSONObject['data']['browser_rule']['content']=content;
-                fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
-                FiddlerObject.StatusText="已切换至xwalk";
-            }
-            if (uiwebview){
-                content = "{\"device_white_list\":[\"\"]}";
-                responseJSON.JSONObject['data']['browser_rule']['content']=content;
-                FiddlerObject.StatusText="已切换至uiwebview";
-                // fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
-            }
-            } else if (oSession.fullUrl.Contains("src=1")){
+        // if (oSession.fullUrl.Contains("src=2")){
+        //     //Android内置默认白名单
+        //     // var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
+        //     //当前请求的设备
+        //     var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
+        //     //接口未返回browser_rule节点时，写入默认内容
+        //     var content = "{}";
+        //     var updatetime = new System.Collections.Hashtable();
+        //     if (!responseJSON.JSONObject['data'].ContainsKey('browser_rule')){
+        //         updatetime.Add('updatetime', ""+new Date().getTime()+"");
+        //         responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
+        //         responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
+        //     }
+        //     if (!uiwebview && xwalk){
+        //         content = "{\"device_white_list\":[\""+device+"\"]}";
+        //         responseJSON.JSONObject['data']['browser_rule']['content']=content;
+        //         fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
+        //         FiddlerObject.StatusText="已切换至xwalk";
+        //     }
+        //     if (uiwebview){
+        //         content = "{\"device_white_list\":[\"\"]}";
+        //         responseJSON.JSONObject['data']['browser_rule']['content']=content;
+        //         FiddlerObject.StatusText="已切换至uiwebview";
+        //         // fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
+        //     }
+        // } else
+        if (oSession.fullUrl.Contains("src=1")){
             if (!uiwebview && webkit){
                 fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
             }
@@ -901,7 +907,7 @@ class Handlers {
         responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
         oSession.utilSetResponseBody(responseStringDestinal);
-    }*/
+    }
 
     if (custom_https) {
       if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
@@ -997,6 +1003,9 @@ class Handlers {
 
       static function OnBoot() {
           getMcData();
+          var url = "http://l3.51fanli.net/app/images/2017/08/59967e46962ff.png?";
+          url = replaceParam(url,"aaa","bbb");
+          FiddlerObject.log(url);
           // MessageBox.Show("Fiddler has finished booting");
           // System.Diagnostics.Process.Start("iexplore.exe");
           //
