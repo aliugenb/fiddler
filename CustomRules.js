@@ -244,7 +244,7 @@ class Handlers {
       return;
     }
     for (var x = 0; x < oSessions.Length; x++) {
-      var bpaurl = oSessions[x].url.substr(0, oSessions[x].url.indexOf("?"));
+      var bpaurl = getHostPath(oSessions[x].url);
       bpResponseURIs.push(bpaurl);
     }
     FiddlerObject.StatusText = "选中了" + oSessions.Length + "条url";
@@ -259,7 +259,7 @@ class Handlers {
       return;
     }
     for (var x = 0; x < oSessions.Length; x++) {
-      var bpuurl = oSessions[x].url.substr(0, oSessions[x].url.indexOf("?"));
+      var bpuurl = getHostPath(oSessions[x].url);
       bpRequestURIs.push(bpuurl);
     }
     FiddlerObject.StatusText = "选中了" + oSessions.Length + "条url";
@@ -282,6 +282,16 @@ class Handlers {
     }
     Utilities.CopyToClipboard(ifanli_urls.ToString());
     MessageBox.Show("已复制到剪切板.");
+  }
+
+  //获取host+path
+  static function getHostPath(url){
+    if(url.indexOf("?") == -1){
+      url = url.substr(url.indexOf("//") + 2);
+    }else {
+      url = url.substr(url.indexOf("//")+2, url.indexOf("?")-url.indexOf("//")-2);
+    }
+    return url;
   }
 
   //删除指定key
@@ -372,7 +382,7 @@ class Handlers {
       return;
     }
     for (var x = 0; x < oSessions.Length; x++) {
-      var mark_url = oSessions[x].url.substr(0, oSessions[x].url.indexOf("?"));
+      var mark_url = getHostPath(oSessions[x].url);
       mark_txt.writeLine(mark_url);
     }
     mark_txt.close();
@@ -631,7 +641,7 @@ class Handlers {
     //     oSession["ui-backcolor"] = "red";
     // }
 
-    if (oSession.host.Contains("fanli.com") || oSession.host.Contains("shzyfl.cn")) {
+    if (oSession.host.Contains("fanli") || oSession.host.Contains("shzyfl")) {
       var fso = new ActiveXObject("Scripting.FileSystemObject");
       if (fso.FileExists("markUrls.txt")) {
         var mark_txt = fso.OpenTextFile("markUrls.txt", 1, true, true);
@@ -862,7 +872,7 @@ class Handlers {
     //	oSession.oResponse.headers["Ext"] = '';
     // }
 
-    if (/(?i)^http:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=dynamic.*$/.test(oSession.fullUrl)){
+    if (/(?i)^http[s]?:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=dynamic.*$/.test(oSession.fullUrl)){
         var responseStringOriginal =  oSession.GetResponseBodyAsString();
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
         if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')){
@@ -919,10 +929,8 @@ class Handlers {
         var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
         if (custom_https==1){
           fanliSwitch = fanliSwitch.replace(/"https":(\d*)/, "\"https\":1");
-          FiddlerObject.StatusText = "https已打开";
         }else if(custom_https==0){
           fanliSwitch = fanliSwitch.replace(/"https":(\d*)/, "\"https\":0");
-          FiddlerObject.StatusText = "https已关闭";
         }
         responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
@@ -940,9 +948,9 @@ class Handlers {
         }
         var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
         //添加不存在的节点
-        fanliSwitch = fanliSwitch.replace(/\}$/, ",\"goshop_https\":1}");
+        // fanliSwitch = fanliSwitch.replace(/\}$/, ",\"goshop_https\":1}");
         //替换存在的节点
-        // fanliSwitch = fanliSwitch.replace(/"union_login":(\d*)/, "\"union_login\":15");
+        fanliSwitch = fanliSwitch.replace(/"proxy":(\d*)/, "\"proxy\":0");
         responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
 
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
