@@ -21,10 +21,9 @@ var m_image: boolean = false; //定义选项变量名<br>
 `通过以上方式添加的子菜单选项，同时能选中多个`
 
 2. 添加Tools子菜单(以switchHost功能为例)<br>
-
-public static ToolsAction("&Edit Hosts") //在tools下添加子菜单EditHost(不太清楚&功能)<br>
-function EditHosts() {
-  xxxx;
+public static ToolsAction("&Edit Hosts") //在tools下添加子菜单EditHost(不太清楚&功能，有无&好像没有区别)<br>
+function EditHosts() {<br>
+  xxxx;<br>
 }
 
 3.
