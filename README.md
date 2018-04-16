@@ -45,3 +45,23 @@ function MarkColor(oSessions: Session[]) {<br>
   m_abtest = getAbtest(m_abtest);
   return true;`<br>
 其中第一行case "xxxx"定义命令名称<br>
+FiddlerObject.StatusText定义命令行下方右侧显示文案
+
+5. 添加自定义的标签，如背景色、字体加粗等<br>
+oSession["ui-backcolor"] = "Yellow"; //设置背景颜色，颜色名称<br>
+oSession["ui-customcolumn"] = '高佣api'; //设置Custom一列显示文案<br>
+FiddlerObject.playSound("C:\\windows\\media\\tada.wav"); //设置请求时播放的声音<br>
+oSession["ui-color"] = "red"; //设置字体颜色，颜色名称<br>
+oSession["ui-italic"] = "yup"; //设置字体斜体，字符串无所谓<br>
+oSession["ui-bold"]="QuickExec";	//设置字体加粗，字符串无所谓<br>
+oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓<br>
+
+6. 获取和修改request或者response header(cookie、UA等)
+oSession.oRequest.headers["User-Agent"]="xxxx"; //修改RequestHeader中User-Agent，如果header中没有User-Agent，会自动添加<br>
+oSession.oRequest.headers.Remove("User-Agent"); //移除RequestHeader中的User-Agent<br>
+oSession.oResponse.headers 用法与上一致，作用与ResponseHeader
+
+7. 获取和修改response
+
+
+## Fiddler的部分变量和api
