@@ -9,6 +9,19 @@ Fiddler启动时执行该方法
 4. OnExecAction<br>
 定义命令行输入的命令
 
+## Fiddler的部分变量和api
+1. oSession //代表Fiddler中捕获的每个请求<br>
+oSession.host //请求的host<br>
+oSession.HostnameIs("xxxx") //判断当前host是否等于xxxx<br>
+oSession.fullUrl //请求的url<br>
+oSession.fullUrl.Contains("xxxx") //判断当前请求的url是否包含xxxx，方法同样适用于oSession.host<br>
+oSession.uriContains("xxxx") //判断当前请求的url是否包含xxxx<br>
+oSession.m_hostIP //请求的IP地址<br>
+oSession.responseCode //请求的状态码<br>
+oSession.HTTPMethodIs("xxxx") //判断当前的请求方式，一般是"CONNECT"/"GET"/"POST"等<br>
+oSession.isTunnel //判断当前的请求是否是CONNECT Tunnel<br>
+oSession.isHTTPS //判断当前的请求是否是https
+
 ## 如何自定义功能
 1. 添加Rules子菜单(以switchHost功能为例)<br>
 RulesString("SwitchHosts", true) //在rules下添加菜单名SwitchHost<br>
@@ -76,14 +89,3 @@ if (custom_https==1){<br>
 responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;<br>
 var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject); <br>
 oSession.utilSetResponseBody(responseStringDestinal); //重新设置Response Body<br>
-
-## Fiddler的部分变量和api
-1. oSession //代表Fiddler中捕获的每个请求<br>
-oSession.host //请求的host<br>
-oSession.HostnameIs("xxxx") //判断当前host是否等于xxxx<br>
-oSession.fullUrl //整个请求url<br>
-oSession.fullUrl.Contains("xxxx") //判断当前请求的url是否包含xxxx，方法同样适用于oSession.host<br>
-oSession.uriContains("xxxx") //判断当前请求的url是否包含xxxx<br>
-oSession.m_hostIP //当前请求的IP地址<br>
-oSession.responseCode //请求的状态码<br>
-oSession.HTTPMethodIs("xxxx") //判断当前的请求方式，一般是"CONNECT"/"GET"/"POST"等<br>
