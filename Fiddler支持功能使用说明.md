@@ -6,7 +6,7 @@
 1.	在fiddler工具的安装路径下新建Hosts文件夹
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/swithhost1.png" width="420" height="120"  />
 
-2. Hosts文件夹内添加.hosts文件（或者复制swihost工具下hosts文件）
+2. Hosts文件夹内添加.hosts文件（或者复制switchhost工具下hosts文件）
 需保证.hosts文件与CustomRules.js中(下图红框内)命名一致
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost2.png" width="420" height="100"  /><br>
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/switchhost3.png" width="420" height="100"  />

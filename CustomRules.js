@@ -784,7 +784,7 @@ class Handlers {
     if (m_Hide304s && oSession.responseCode == 304) {
       oSession["ui-hide"] = "true";
     }
-   
+
     if (/(?i)^http[s]?:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=dynamic.*$/.test(oSession.fullUrl)){
         var responseStringOriginal =  oSession.GetResponseBodyAsString();
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
