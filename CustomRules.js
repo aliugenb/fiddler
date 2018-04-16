@@ -210,7 +210,7 @@ class Handlers {
       return;
     }
     for (var x = 0; x < oSessions.Length; x++) {
-      var bpaurl = oSessions[x].url.substr(0, oSessions[x].url.indexOf("?"));
+      var bpaurl = getHostPath(oSessions[x].url);
       bpResponseURIs.push(bpaurl);
     }
     FiddlerObject.StatusText = "选中了" + oSessions.Length + "条url";
@@ -225,7 +225,7 @@ class Handlers {
       return;
     }
     for (var x = 0; x < oSessions.Length; x++) {
-      var bpuurl = oSessions[x].url.substr(0, oSessions[x].url.indexOf("?"));
+      var bpuurl = getHostPath(oSessions[x].url);
       bpRequestURIs.push(bpuurl);
     }
     FiddlerObject.StatusText = "选中了" + oSessions.Length + "条url";
@@ -248,6 +248,16 @@ class Handlers {
     }
     Utilities.CopyToClipboard(ifanli_urls.ToString());
     MessageBox.Show("已复制到剪切板.");
+  }
+
+  //获取host+path
+  static function getHostPath(url){
+    if(url.indexOf("?") == -1){
+      url = url.substr(url.indexOf("//") + 2);
+    }else {
+      url = url.substr(url.indexOf("//")+2, url.indexOf("?")-url.indexOf("//")-2);
+    }
+    return url;
   }
 
   //删除指定key
@@ -338,7 +348,7 @@ class Handlers {
       return;
     }
     for (var x = 0; x < oSessions.Length; x++) {
-      var mark_url = oSessions[x].url.substr(0, oSessions[x].url.indexOf("?"));
+      var mark_url = getHostPath(oSessions[x].url);
       mark_txt.writeLine(mark_url);
     }
     mark_txt.close();
