@@ -56,12 +56,25 @@ oSession["ui-italic"] = "yup"; //设置字体斜体，字符串无所谓<br>
 oSession["ui-bold"]="QuickExec";	//设置字体加粗，字符串无所谓<br>
 oSession["ui-hide"] = "NotMyApp";	//隐藏显示，字符串无所谓<br>
 
-6. 获取和修改request或者response header(cookie、UA等)
-oSession.oRequest.headers["User-Agent"]="xxxx"; //修改RequestHeader中User-Agent，如果header中没有User-Agent，会自动添加<br>
+6. 添加和修改request或者response header(cookie、UA等)<br>
+oSession.oRequest.headers["User-Agent"]="xxxx"; //修改RequestHeader中User-Agent，如果header中没有"User-Agent"，会自动添加<br>
 oSession.oRequest.headers.Remove("User-Agent"); //移除RequestHeader中的User-Agent<br>
-oSession.oResponse.headers 用法与上一致，作用与ResponseHeader
+oSession.oResponse.headers 用法与上一致，作用于ResponseHeader
 
-7. 获取和修改response
-
+7. 获取和修改response(以https开关为例)<br>
+var responseStringOriginal = oSession.GetResponseBodyAsString(); //获取Response Body中JSON字符串 <br>
+var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal); //转换为可编辑的JSONObject变量<br>
+if (!responseJSON.JSONObject ||<br> !responseJSON.JSONObject['data'].ContainsKey('switch')) {<br>
+  return;<br>
+}<br>
+var fanliSwitch = responseJSON.JSONObject['data']['switch']['content']; //获取getResource接口switch节点content内容<br>
+if (custom_https==1){<br>
+  fanliSwitch = fanliSwitch.replace(/"https":(\d*)/, "\"https\":1");<br>
+}else if(custom_https==0){<br>
+  fanliSwitch = fanliSwitch.replace(/"https":(\d*)/, "\"https\":0");<br>
+}<br><br>
+responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;<br>
+var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject); <br>
+oSession.utilSetResponseBody(responseStringDestinal); //重新设置Response Body<br>
 
 ## Fiddler的部分变量和api
