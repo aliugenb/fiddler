@@ -26,4 +26,24 @@ function EditHosts() {<br>
   xxxx;<br>
 }
 
-3.
+3. 添加右键菜单<br>
+public static ContextAction("Mark") //右键request弹出框添加子菜单Mark<br>
+function MarkColor(oSessions: Session[]) {<br>
+    xxxx;<br>
+}
+
+4. 修改或添加Fiddler命令行(以abtest功能为例)<br>
+在OnExecAction方法中switch (sAction) 下添加自定义名称<br>
+`
+case "abtest":
+  if (sParams.Length < 2) {
+    m_abtest = null;
+    FiddlerObject.StatusText = "abtest cleared";
+    return false;
+  }
+  m_abtest = sParams[1];
+  FiddlerObject.StatusText = "abtest参数 " + sParams[1];
+  m_abtest = getAbtest(m_abtest);
+  return true;
+`<br>
+其中第一行case "xxxx"定义命令名称<br>
