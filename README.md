@@ -22,6 +22,8 @@ oSession.HTTPMethodIs("xxxx") //判断当前的请求方式，一般是"CONNECT"
 oSession.isTunnel //判断当前的请求是否是CONNECT Tunnel<br>
 oSession.isHTTPS //判断当前的请求是否是https
 
+2.
+
 ## 如何自定义功能
 1. 添加Rules子菜单(以switchHost功能为例)<br>
 RulesString("SwitchHosts", true) //在rules下添加菜单名SwitchHost<br>
