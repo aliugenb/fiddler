@@ -78,3 +78,12 @@ var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSO
 oSession.utilSetResponseBody(responseStringDestinal); //重新设置Response Body<br>
 
 ## Fiddler的部分变量和api
+1. oSession //代表Fiddler中捕获的每个请求
+* oSession.host //请求的host
+* oSession.HostnameIs("xxxx") //判断当前host是否等于xxxx
+* oSession.fullUrl //整个请求url
+* oSession.fullUrl.Contains("xxxx") //判断当前请求的url是否包含xxxx，方法同样适用于oSession.host
+* oSession.uriContains("xxxx") //判断当前请求的url是否包含xxxx
+* oSession.m_hostIP //当前请求的IP地址
+* oSession.responseCode //请求的状态码
+* oSession.HTTPMethodIs("xxxx") //判断当前的请求方式，一般是"CONNECT"/"GET"/"POST"等
