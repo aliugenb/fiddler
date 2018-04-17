@@ -534,7 +534,7 @@ class Handlers {
           return;
         }
       } else {
-        MessageBox.Show(testGroup[0] + "内部gw接口调用错误");
+        MessageBox.Show(testGroup[0] + "内部调用gw接口错误");
         return;
       }
       abtests.push({
