@@ -1,4 +1,4 @@
-﻿﻿import System;
+﻿import System;
 import System.Windows.Forms;
 import Fiddler;
 
@@ -40,10 +40,10 @@ class Handlers {
   // The following snippet demonstrates a custom-bound column for the Web Sessions list.
   // See http://fiddler2.com/r/?fiddlercolumns for more info
 
-  // public static BindUIColumn("Method", 60)
-  // function FillMethodColumn(oS: Session): String {
-  //   return oS.RequestMethod;
-  // }
+  public static BindUIColumn("Method", 60)
+  function FillMethodColumn(oS: Session): String {
+    return oS.RequestMethod;
+  }
 
 
   // The following snippet demonstrates how to create a custom tab that shows simple text
@@ -124,6 +124,9 @@ class Handlers {
   RulesStringValue(0, "打开", "1")
   public static var custom_response: String = null;
 
+  // public static RulesOption("切换xwalk", "切换浏览器内核")
+  // var xwalk: boolean = false;
+  //
   public static RulesOption("切换webkit", "切换浏览器内核")
   var webkit: boolean = false;
 
@@ -132,11 +135,11 @@ class Handlers {
 
   RulesString("SwitchHosts", true)
   RulesStringValue(0, "外测", "waice")
-  RulesStringValue(0, "外测-29", "waice-29")
-  RulesStringValue(1, "158", "158")
-  RulesStringValue(2, "生产", "shengchan")
-  RulesStringValue(3, "custom外测", "custom-waice")
-  RulesStringValue(3, "custom内测", "custom-neice")
+  RulesStringValue(1, "外测-29", "waice-29")
+  RulesStringValue(2, "158", "158")
+  RulesStringValue(3, "生产", "shengchan")
+  RulesStringValue(4, "custom外测", "custom-waice")
+  RulesStringValue(5, "custom内测", "custom-neice")
   public static var m_host: String = null;
 
   public static RulesOption("图片是否绑定生产", "SwitchHosts")
@@ -150,9 +153,6 @@ class Handlers {
   public static RulesOption("打开304", "打开304")
   var allow_304: boolean = false;
 
-  public static RulesOption("显示", "显示MC")
-  var m_mc: boolean = false;
-
   // Cause Fiddler to delay HTTP traffic to simulate typical 56k modem conditions
   public static RulesOption("Simulate &Modem Speeds", "Per&formance")
   var m_SimulateModem: boolean = false;
@@ -163,6 +163,9 @@ class Handlers {
 
   public static RulesOption("Cache Always &Fresh", "Per&formance")
   var m_AlwaysFresh: boolean = false;
+
+  public static RulesOption("显示", "显示MC")
+  var m_mc: boolean = false;
 
   public static ToolsAction("&Edit Hosts")
   function EditHosts() {
@@ -179,6 +182,14 @@ class Handlers {
   function DoManualReload() {
     FiddlerObject.ReloadScript();
   }
+
+  // Create a new item on the Tools menu.
+  // public static ToolsAction("&UNTITLED")
+  // function DoUNTITLED(oSessions: Fiddler.Session[]){
+  // 	// Write your code here
+  //
+  // 	MessageBox.Show(FiddlerObject.prompt("aaa","bbb","ccc"));
+  // }
 
   public static ContextAction("Open in Browser")
   function DoOpenInIE(oSessions: Fiddler.Session[]) {
@@ -200,6 +211,29 @@ class Handlers {
     }
     UI.actUpdateInspector(true, true);
   }
+
+  // public static ContextAction("CopyTimers")
+  // function CopyTimers(oSessions: Fiddler.Session[]){
+  //     if (null == oSessions){
+  //         MessageBox.Show("Please select sessions to copy timers for.", "Nothing to Do");
+  //         return;
+  //     }
+  //     var s: System.Text.StringBuilder = new System.Text.StringBuilder();
+  //     for (var x = 0; x < oSessions.Length; x++)  {
+  //         s.AppendFormat("ClientConnected:{0}, ClientDoneRequest:{1}, ServerConnected:{2}, ServerGotRequest:{3}, ServerBeginResponse:{4}, ServerDoneResponse:{5}, ClientBeginResponse:{6}, ClientDoneResponse:{7}\r\n",
+  //             oSessions[x].Timers.ClientConnected,
+  //             oSessions[x].Timers.ClientDoneRequest,
+  //             oSessions[x].Timers.ServerConnected,
+  //             oSessions[x].Timers.ServerGotRequest,
+  //             oSessions[x].Timers.ServerBeginResponse,
+  //             oSessions[x].Timers.ServerDoneResponse,
+  //             oSessions[x].Timers.ClientBeginResponse,
+  //             oSessions[x].Timers.ClientDoneResponse
+  //             );
+  //     }
+  //     Utilities.CopyToClipboard(s.ToString());
+  //     MessageBox.Show("已复制到剪切板.");
+  // }
 
   //bpafter url
   public static var bpResponseURIs = new Array();
@@ -500,7 +534,7 @@ class Handlers {
           return;
         }
       } else {
-        MessageBox.Show(testGroup[0] + "内部gw接口调用错误");
+        MessageBox.Show(testGroup[0] + "内部调用gw接口错误");
         return;
       }
       abtests.push({
@@ -594,6 +628,18 @@ class Handlers {
       oSession["ui-customcolumn"] = 'https开关';
       oSession["ui-backcolor"] = "orange";
     }
+
+    // if(!close_https&& oSession.uriContains("fanli.com")&& !oSession.isHTTPS){
+    //     oSession["ui-backcolor"] = "yellow";
+    // }
+
+    // if (/^(?i)http[s]?:\/\/l[\d].(fanli|51fanli).net.*$/.test(oSession.fullUrl)&&oSession.isHTTPS){
+    //     oSession["ui-backcolor"] = "red";
+    // }
+
+    // if(close_https&& oSession.uriContains("fanli.com")&& oSession.isHTTPS){
+    //     oSession["ui-backcolor"] = "red";
+    // }
 
     if (oSession.host.Contains("fanli") || oSession.host.Contains("shzyfl")) {
       var fso = new ActiveXObject("Scripting.FileSystemObject");
@@ -718,6 +764,13 @@ class Handlers {
       }
     }
 
+    /*if (oSession.fullUrl.Contains("app/v1/resource/bussiness")){
+        if (oSession.fullUrl.Contains("http://m.api.fanli.com/app/v4/sf/limitedProducts")){
+			oSession.oRequest.headers["If-None-Match"] = 'no-cache';
+			oSession.oRequest.headers.Remove("Cache-Control");
+	    }*/
+
+
     // 保存request到本地
     /*if (oSession.host.Contains("fanli")){
             if (inArray(image_hosts, oSession.host) || inArray(filter_hosts, oSession.host) || oSession.host.Contains("51fanli.net")){
@@ -779,6 +832,10 @@ class Handlers {
       oSession.bBufferResponse = true;
     }
 
+    // if ((null!=bpResponseURI) && oSession.uriContains(bpResponseURI)) {
+    //     oSession["x-breakresponse"]="uri";
+    //     oSession.bBufferResponse = true;
+    // }
     if (bpResponseURIs.length > 0) {
       for (var i = 0; i < bpResponseURIs.length; i++) {
         if (oSession.uriContains(bpResponseURIs[i])) {
@@ -794,6 +851,26 @@ class Handlers {
     if (m_Hide304s && oSession.responseCode == 304) {
       oSession["ui-hide"] = "true";
     }
+    // if (oSession.fullUrl.Contains("http://fun.fanli.com/goshop/go?")){
+    // 	var i_id = getParam(oSession.fullUrl, "pid").Value;
+    // 	oSession.oResponse.headers["Ext"] = "i_id="+i_id+""+";s_id=712";
+    // }
+    //修改response header
+
+    // if (oSession.fullUrl.Contains("goshop")){
+    /*   oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fso.m.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=https%3A%2F%2Fitem.m.jd.com%2Fproduct%2F1637718451.html;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fproduct%2F1637718451.html;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fitem.jd.com%2F1637718451.html;s_id=544';
+            oSession.oResponse.headers["Ext"] = 's_u=http%3A%2F%2Fm.jd.com%2Fware%2Fsearch.action%3Fkeyword%3D%25E6%2596%25B0%25E6%25AC%25BE%25E8%25BF%259E%25E8%25A1%25A3%25E8%25A3%2599;s_id=544';
+			oSession.oResponse.headers["Cache-Control"] = 'max-age=30';
+			oSession.oResponse.headers.Remove("Cache-Control");
+			oSession.oResponse.headers["Last-Modified"] = "Tue, 24 Feb 2017 08:01:04 GMT";
+            oSession.oResponse.headers.Remove("Last-Modified");
+            oSession.oResponse.headers["Expires"] = 'Mon, 21 Nov 2017 17:28:26 GMT';*/
+    //  oSession.oResponse.headers.Remove("Ext");
+    //	oSession.oResponse.headers["Ext"] = '';
+    // }
 
     if (/(?i)^http[s]?:\/\/fun\.fanli\.com\/api\/mobile\/getResource\?.*key=dynamic.*$/.test(oSession.fullUrl)){
         var responseStringOriginal =  oSession.GetResponseBodyAsString();
@@ -802,6 +879,32 @@ class Handlers {
             return;
         }
         var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+        // if (oSession.fullUrl.Contains("src=2")){
+        //     //Android内置默认白名单
+        //     // var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
+        //     //当前请求的设备
+        //     var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
+        //     //接口未返回browser_rule节点时，写入默认内容
+        //     var content = "{}";
+        //     var updatetime = new System.Collections.Hashtable();
+        //     if (!responseJSON.JSONObject['data'].ContainsKey('browser_rule')){
+        //         updatetime.Add('updatetime', ""+new Date().getTime()+"");
+        //         responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
+        //         responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
+        //     }
+        //     if (!uiwebview && xwalk){
+        //         content = "{\"device_white_list\":[\""+device+"\"]}";
+        //         responseJSON.JSONObject['data']['browser_rule']['content']=content;
+        //         fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
+        //         FiddlerObject.StatusText="已切换至xwalk";
+        //     }
+        //     if (uiwebview){
+        //         content = "{\"device_white_list\":[\"\"]}";
+        //         responseJSON.JSONObject['data']['browser_rule']['content']=content;
+        //         FiddlerObject.StatusText="已切换至uiwebview";
+        //         // fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
+        //     }
+        // } else
         if (oSession.fullUrl.Contains("src=1")){
             if (!uiwebview && webkit){
                 fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
@@ -855,15 +958,15 @@ class Handlers {
       }
 
       //超级返首页popmsg
-      // if (oSession.fullUrl.Contains("key=popmsg")) {
-      //   FiddlerObject.log('enter custom');
-      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
-      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-      //   responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 100) + 1)).JSONObject.toString();
-      //   responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 1000) + 1)).JSONObject;
-      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
-      //   oSession.utilSetResponseBody(responseStringDestinal);
-      // }
+      if (oSession.fullUrl.Contains("fanli")) {
+        FiddlerObject.log('enter custom');
+        var responseStringOriginal = oSession.GetResponseBodyAsString();
+        var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+        responseJSON.JSONObject['data']['popmsg']['id'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 100) + 1)).JSONObject.toString();
+        responseJSON.JSONObject['data']['popmsg']['lastUpdateTime'] = Fiddler.WebFormats.JSON.JsonDecode(Math.floor((Math.random() * 1000) + 1)).JSONObject;
+        var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+        oSession.utilSetResponseBody(responseStringDestinal);
+      }
     }
 
     // 保存response到本地
