@@ -26,7 +26,7 @@ oSession.isHTTPS //判断当前的请求是否是https
 
 3. MessageBox.Show("xxxx") //Fiddler以弹窗形式显示xxxx
 
-4. FiddlerApplication.oProxy.SendRequestAndWait(HTTPRequestHeaders,null,null,null) //该方法可以通过fiddler发起请求，第一个参数为数组，可以添加指定请求的url及header中参数等，后续值暂未使用过<br>
+4. FiddlerApplication.oProxy.SendRequestAndWait(HTTPRequestHeaders,null,null,null) //该方法可以通过fiddler发起请求，第一个参数可以添加指定请求的url及header中参数等，后续值暂未使用过<br>
 `var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path + testGroup[0], ['Host: gw.api.fanli.com', 'custom_abtest: ' + testGroup[0]]);
 abtest_headers.HTTPMethod = "GET";
 var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);`
