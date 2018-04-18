@@ -1,9 +1,17 @@
 # Fiddler功能使用说明
 ## 目前支持的功能：
 切换host、自定义abtest参数、显示MC渠道名、其他小功能
+
+### 使用git同步至本地
+1. <https://git-scm.com/downloads>下载安装git
+2. 在我的文档--Fiddler2--Scripts文件夹下执行以下命令：<br>
+git init <br>
+git remote add {自定义别名} http://192.168.0.176:4040/AppTest/Fiddler.git<br>
+git pull {自定义别名} master<br>
+
 ### 一、SwitchHost功能
 #### 使用方法：
-1.	在fiddler工具的安装路径下新建Hosts文件夹
+1. 在fiddler工具的安装路径下新建Hosts文件夹
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/switchhost/swithhost1.png" width="420" height="120"  />
 
 2. Hosts文件夹内添加.hosts文件（或者复制switchhost工具下hosts文件）
