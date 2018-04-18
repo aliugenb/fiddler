@@ -22,17 +22,36 @@ oSession.HTTPMethodIs("xxxx") //判断当前的请求方式，一般是"CONNECT"
 oSession.isTunnel //判断当前的请求是否是CONNECT Tunnel<br>
 oSession.isHTTPS //判断当前的请求是否是https
 
-2.
+2. FiddlerObject.log() //打印log日志，在右侧log一栏输出
+
+3. MessageBox.Show("xxxx") //Fiddler以弹窗形式显示xxxx
+
+4. FiddlerApplication.oProxy.SendRequestAndWait(HTTPRequestHeaders,null,null,null) //该方法可以通过fiddler发起请求，第一个参数可以添加指定请求的url及header中参数等，后续值暂未使用过<br>
+`var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path + testGroup[0], ['Host: gw.api.fanli.com', 'custom_abtest: ' + testGroup[0]]);
+abtest_headers.HTTPMethod = "GET";
+var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);`
+
+5. oSession.utilFindInResponse(String,false) //在Response中查找关键字，并返回位置下标，找不到返回-1<br>
+oSession.utilFindInRequest(String,false) //用法与上一致，作用于Request
+
+6. new ActiveXObject("Scripting.FileSystemObject").FileExists //判断本地文件是否存在<br>
+new ActiveXObject("Scripting.FileSystemObject").DeleteFile //删除本地文件
+
+7. new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(String filename, int iomode, boolean create, int format) //打开或者写入本地文件，其中<br>
+filename: 写入的文件名<br>
+inmode: 1代表只读打开文件；8代表追加写入<br>
+create: True 代表文件不存在是创建文件; False代表文件不存在时不创建文件;<br>
+format: -2 '以系统默认格式打开文件;-1 '以 Unicode 格式打开文件;0 '以 ASCII 格式打开文件
 
 ## 如何自定义功能
 1. 添加Rules子菜单(以switchHost功能为例)<br>
 RulesString("SwitchHosts", true) //在rules下添加菜单名SwitchHost<br>
 RulesStringValue(0, "外测", "waice")<br>
 RulesStringValue(0, "外测-29", "waice-29") //在SwitchHost下添加子菜单,可以添加多个其中"0"是子菜单的排序，"外测"是菜单显示的名称，"waice"是定义当前选项的变量名<br>
-public static var m_host: String = null; //定义整个子菜单的开关<br>
+public static var m_host: String = null; //定义选项变量名及默认状态<br>
 `通过以上方式添加的子菜单选项，同时只能选中一个`<br>
 public static RulesOption("图片是否绑定生产", "SwitchHosts") //在SwitchHost下添加选项<br>
-var m_image: boolean = false; //定义选项变量名<br>
+var m_image: boolean = false; //定义选项变量名及默认状态<br>
 `通过以上方式添加的子菜单选项，同时能选中多个`
 
 2. 添加Tools子菜单(以switchHost功能为例)<br>
