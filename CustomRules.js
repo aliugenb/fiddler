@@ -212,29 +212,6 @@ class Handlers {
     UI.actUpdateInspector(true, true);
   }
 
-  // public static ContextAction("CopyTimers")
-  // function CopyTimers(oSessions: Fiddler.Session[]){
-  //     if (null == oSessions){
-  //         MessageBox.Show("Please select sessions to copy timers for.", "Nothing to Do");
-  //         return;
-  //     }
-  //     var s: System.Text.StringBuilder = new System.Text.StringBuilder();
-  //     for (var x = 0; x < oSessions.Length; x++)  {
-  //         s.AppendFormat("ClientConnected:{0}, ClientDoneRequest:{1}, ServerConnected:{2}, ServerGotRequest:{3}, ServerBeginResponse:{4}, ServerDoneResponse:{5}, ClientBeginResponse:{6}, ClientDoneResponse:{7}\r\n",
-  //             oSessions[x].Timers.ClientConnected,
-  //             oSessions[x].Timers.ClientDoneRequest,
-  //             oSessions[x].Timers.ServerConnected,
-  //             oSessions[x].Timers.ServerGotRequest,
-  //             oSessions[x].Timers.ServerBeginResponse,
-  //             oSessions[x].Timers.ServerDoneResponse,
-  //             oSessions[x].Timers.ClientBeginResponse,
-  //             oSessions[x].Timers.ClientDoneResponse
-  //             );
-  //     }
-  //     Utilities.CopyToClipboard(s.ToString());
-  //     MessageBox.Show("已复制到剪切板.");
-  // }
-
   //bpafter url
   public static var bpResponseURIs = new Array();
   public static ContextAction("bpa")
@@ -534,7 +511,7 @@ class Handlers {
           return;
         }
       } else {
-        MessageBox.Show(testGroup[0] + "内部调用gw接口错误");
+        MessageBox.Show(testGroup[0] + "内部gw接口调用错误");
         return;
       }
       abtests.push({
@@ -879,32 +856,6 @@ class Handlers {
             return;
         }
         var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-        // if (oSession.fullUrl.Contains("src=2")){
-        //     //Android内置默认白名单
-        //     // var white_devices = new Array("SM801", "HUAWEI MT7-TL00", "MI NOTE LTE", "Redmi Note 3", "vivo X6S A", "Le X820", "X600","SM-G9300", "SM-G9308", "OPPO R7", "OPPO R9m");
-        //     //当前请求的设备
-        //     var device = oSession.oRequest.headers['User-Agent'].match(/(?<=\(\w+\s+).*(?=;\s*Android)/)[0];
-        //     //接口未返回browser_rule节点时，写入默认内容
-        //     var content = "{}";
-        //     var updatetime = new System.Collections.Hashtable();
-        //     if (!responseJSON.JSONObject['data'].ContainsKey('browser_rule')){
-        //         updatetime.Add('updatetime', ""+new Date().getTime()+"");
-        //         responseJSON.JSONObject['data'].Add('browser_rule',updatetime);
-        //         responseJSON.JSONObject['data']['browser_rule'].Add('content', content);
-        //     }
-        //     if (!uiwebview && xwalk){
-        //         content = "{\"device_white_list\":[\""+device+"\"]}";
-        //         responseJSON.JSONObject['data']['browser_rule']['content']=content;
-        //         fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":2"):fanliSwitch.replace(/\}$/, ",\"browser_type\":2}");
-        //         FiddlerObject.StatusText="已切换至xwalk";
-        //     }
-        //     if (uiwebview){
-        //         content = "{\"device_white_list\":[\"\"]}";
-        //         responseJSON.JSONObject['data']['browser_rule']['content']=content;
-        //         FiddlerObject.StatusText="已切换至uiwebview";
-        //         // fanliSwitch = (/^\{.*browser_type.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"browser_type":[\d]/, "\"browser_type\":1"):fanliSwitch.replace(/\}$/, ",\"browser_type\":1}");
-        //     }
-        // } else
         if (oSession.fullUrl.Contains("src=1")){
             if (!uiwebview && webkit){
                 fanliSwitch = (/^\{.*force_uiwv.*\}$/.test(fanliSwitch))?fanliSwitch.replace(/"force_uiwv":[\d]/, "\"force_uiwv\":2"):fanliSwitch.replace(/\}$/, ",\"force_uiwv\":2}");
