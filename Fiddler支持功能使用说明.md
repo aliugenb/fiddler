@@ -4,7 +4,8 @@
 
 ### 使用git同步至本地
 1. <https://git-scm.com/downloads>下载安装git
-2. 在我的文档--Fiddler2--Scripts文件夹下执行以下命令：<br>
+2. 我的文档--Fiddler2--Scripts文件夹下删除CustomRules.js文件
+3. 该路径下执行以下命令：<br>
 git init <br>
 git remote add {自定义别名} http://192.168.0.176:4040/AppTest/Fiddler.git<br>
 git pull {自定义别名} master<br>
