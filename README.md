@@ -52,7 +52,10 @@ public static var m_host: String = null; //定义选项变量名及默认状态<
 `通过以上方式添加的子菜单选项，同时只能选中一个`<br>
 public static RulesOption("图片是否绑定生产", "SwitchHosts") //在SwitchHost下添加选项<br>
 var m_image: boolean = false; //定义选项变量名及默认状态<br>
-`通过以上方式添加的子菜单选项，同时能选中多个`
+`通过以上方式添加的子菜单选项，同时能选中多个`<br>
+如果添加的菜单需要一直保持选中的状态，除非手动切换，其他如重启FIddler等操作仍然保持之前选中的状态<br>
+以上述内容中var m_host:为例，script中添加<br>
+'BindPref("fiddlerscript.rules.m_host")'
 
 2. 添加Tools子菜单(以switchHost功能为例)<br>
 public static ToolsAction("&Edit Hosts") //在tools下添加子菜单EditHost(不太清楚&功能，有无&好像没有区别)<br>
