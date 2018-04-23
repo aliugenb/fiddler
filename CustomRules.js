@@ -122,6 +122,7 @@ class Handlers {
 
   RulesString("Custom Response", true)
   RulesStringValue(0, "打开", "1")
+  BindPref("fiddlerscript.rules.custom_response")
   public static var custom_response: String = null;
 
   // public static RulesOption("切换xwalk", "切换浏览器内核")
@@ -135,11 +136,11 @@ class Handlers {
 
   RulesString("SwitchHosts", true)
   RulesStringValue(0, "外测", "waice")
-  RulesStringValue(0, "外测-29", "waice-29")
-  RulesStringValue(1, "158", "158")
-  RulesStringValue(2, "生产", "shengchan")
-  RulesStringValue(3, "custom外测", "custom-waice")
-  RulesStringValue(3, "custom内测", "custom-neice")
+  RulesStringValue(1, "外测-29", "waice-29")
+  RulesStringValue(2, "158", "158")
+  RulesStringValue(3, "生产", "shengchan")
+  RulesStringValue(4, "custom外测", "custom-waice")
+  RulesStringValue(5, "custom内测", "custom-neice")
   public static var m_host: String = null;
 
   public static RulesOption("图片是否绑定生产", "SwitchHosts")
@@ -148,6 +149,7 @@ class Handlers {
   RulesString("Https", true)
   RulesStringValue(0, "打开", "1")
   RulesStringValue(0, "关闭", "0")
+  BindPref("fiddlerscript.rules.custom_https")
   public static var custom_https: String = null;
 
   public static RulesOption("打开304", "打开304")
@@ -940,25 +942,25 @@ class Handlers {
 
     if (custom_response) {
       //getResource接口switch节点
-      if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
-        var responseStringOriginal = oSession.GetResponseBodyAsString();
-        var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-        if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
-          return;
-        }
-        var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
-        //添加不存在的节点
-        // fanliSwitch = fanliSwitch.replace(/\}$/, ",\"goshop_https\":1}");
-        //替换存在的节点
-        fanliSwitch = fanliSwitch.replace(/"proxy":(\d*)/, "\"proxy\":0");
-        responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
-
-        var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
-        oSession.utilSetResponseBody(responseStringDestinal);
-      }
+      // if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
+      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
+      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+      //   if (!responseJSON.JSONObject || !responseJSON.JSONObject['data'].ContainsKey('switch')) {
+      //     return;
+      //   }
+      //   var fanliSwitch = responseJSON.JSONObject['data']['switch']['content'];
+      //   //添加不存在的节点
+      //   // fanliSwitch = fanliSwitch.replace(/\}$/, ",\"goshop_https\":1}");
+      //   //替换存在的节点
+      //   fanliSwitch = fanliSwitch.replace(/"proxy":(\d*)/, "\"proxy\":0");
+      //   responseJSON.JSONObject['data']['switch']['content'] = fanliSwitch;
+      //
+      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+      //   oSession.utilSetResponseBody(responseStringDestinal);
+      // }
 
       //超级返首页popmsg
-      // if (oSession.fullUrl.Contains("key=popmsg")) {
+      // if (oSession.fullUrl.Contains("fanli")) {
       //   FiddlerObject.log('enter custom');
       //   var responseStringOriginal = oSession.GetResponseBodyAsString();
       //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
@@ -967,6 +969,20 @@ class Handlers {
       //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
       //   oSession.utilSetResponseBody(responseStringDestinal);
       // }
+
+      if (oSession.fullUrl.Contains("api.fanli.com/app/v1/mapp.htm")) {
+        FiddlerObject.log('enter custom');
+        var responseStringOriginal = oSession.GetResponseBodyAsString();
+        var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+        var productList = responseJSON.JSONObject['data']['productList'][0]['list'];
+        for(var i=0;i<productList.Count;i++){
+          if(!responseJSON.JSONObject['data']['productList'][0]['list'][i].ContainsKey('template')){
+            responseJSON.JSONObject['data']['productList'][0]['list'][i].Add('template',1);
+          }
+        }
+        var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+        oSession.utilSetResponseBody(responseStringDestinal);
+      }
     }
 
     // 保存response到本地
