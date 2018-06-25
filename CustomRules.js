@@ -511,8 +511,8 @@ class Handlers {
   }
 
   public static var m_abtest: String = null;
-  static function getAbtest(str) {
-    var parts = str.split("-");
+  static function getAbtest(abtest, type) {
+    var parts = abtest.split("-");
     if (null == parts) {
       MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
       return;
@@ -525,7 +525,7 @@ class Handlers {
         MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
         return;
       }
-      var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path + testGroup[0], ['Host: gw.api.fanli.com', 'custom_abtest: ' + testGroup[0]]);
+      var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path+"&type="+type+"&bid="+testGroup[0], ['Host: gw.api.fanli.com', 'custom_abtest: '+testGroup[0]]);
       abtest_headers.HTTPMethod = "GET";
       var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);
       if (200 == abtest_session.responseCode) {
@@ -1133,14 +1133,16 @@ class Handlers {
     var sAction = sParams[0].toLowerCase();
     switch (sAction) {
       case "abtest":
-        if (sParams.Length < 2) {
+        if (sParams.length==3 && sParams[2]){
+          m_abtest = getAbtest(sParams[1], sParams[2]);
+        }else if (sParams.length==2) {
+          m_abtest = getAbtest(sParams[1], 1);
+        }else {
           m_abtest = null;
           FiddlerObject.StatusText = "abtest cleared";
           return false;
         }
-        m_abtest = sParams[1];
         FiddlerObject.StatusText = "abtest参数 " + sParams[1];
-        m_abtest = getAbtest(m_abtest);
         return true;
       case "bold":
         if (sParams.Length < 2) {
