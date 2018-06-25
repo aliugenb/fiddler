@@ -141,6 +141,7 @@ class Handlers {
   RulesStringValue(3, "生产", "shengchan")
   RulesStringValue(4, "custom外测", "custom-waice")
   RulesStringValue(5, "custom内测", "custom-neice")
+  BindPref("fiddlerscript.rules.m_host")
   public static var m_host: String = null;
 
   public static RulesOption("图片是否绑定生产", "SwitchHosts")
@@ -161,6 +162,7 @@ class Handlers {
 
   // Removes HTTP-caching related headers and specifies "no-cache" on requests and responses
   public static RulesOption("&Disable Caching", "Per&formance")
+  BindPref("fiddlerscript.rules.m_DisableCaching")
   var m_DisableCaching: boolean = false;
 
   public static RulesOption("Cache Always &Fresh", "Per&formance")
@@ -289,9 +291,9 @@ class Handlers {
   //获取host+path
   static function getHostPath(url){
     if(url.indexOf("?") == -1){
-      url = url.substr(url.indexOf("//") + 2);
+      url = url.substr(url.indexOf("//") + 1);
     }else {
-      url = url.substr(url.indexOf("//")+2, url.indexOf("?")-url.indexOf("//")-2);
+      url = url.substr(url.indexOf("//")+1, url.indexOf("?")-url.indexOf("//")-1);
     }
     return url;
   }
@@ -615,6 +617,7 @@ class Handlers {
 		}*/
 
     if(m_mc && !oSession.isTunnel && oSession.uriContains("passport.fanli.com/mobileapi/i/device/update")){
+      getMcData();
       var os = getParam(oSession.fullUrl, "c_src").Value;
       var mc = getParam(oSession.fullUrl, "mc").Value;
       if(os==2){
@@ -627,7 +630,7 @@ class Handlers {
     }
 
     if (oSession.uriContains("key=dynamic")) {
-      oSession["ui-customcolumn"] = 'https开关';
+      oSession["ui-customcolumn"] = 'switch开关';
       oSession["ui-backcolor"] = "orange";
     }
 
@@ -675,14 +678,19 @@ class Handlers {
           var ip = hosts[i].IP
           if (oSession.HostnameIs(host)) {
             oSession["x-overrideHostname"] = ip;
+            break;
           }
         }
       }
-            FiddlerObject.log(m_image);
       if (m_image && inArray(image_hosts, oSession.host)) {
         oSession["x-overrideHostname"] = original_ip;
         oSession["ui-customcolumn"] = '图片已绑定生产';
       }
+    }
+
+    if(oSession.fullUrl.Contains("api.fanli.com/app/v2/protocol/dys.htm")){
+      var ip = "10.0.5.202";
+      oSession["x-overrideHostname"] = ip;
     }
 
     // Sample Rule: Flag POSTs to fiddler2.com in italics
@@ -941,6 +949,7 @@ class Handlers {
     }
 
     if (custom_response) {
+
       //getResource接口switch节点
       // if (/.*key=dynamic.*$/.test(oSession.fullUrl)) {
       //   var responseStringOriginal = oSession.GetResponseBodyAsString();
@@ -970,19 +979,41 @@ class Handlers {
       //   oSession.utilSetResponseBody(responseStringDestinal);
       // }
 
-      if (oSession.fullUrl.Contains("api.fanli.com/app/v1/mapp.htm")) {
+      if(oSession.fullUrl.Contains("passport.fanli.com/mobileapi/v1/applogin/loginReg?")){
         FiddlerObject.log('enter custom');
         var responseStringOriginal = oSession.GetResponseBodyAsString();
         var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-        var productList = responseJSON.JSONObject['data']['productList'][0]['list'];
-        for(var i=0;i<productList.Count;i++){
-          if(!responseJSON.JSONObject['data']['productList'][0]['list'][i].ContainsKey('template')){
-            responseJSON.JSONObject['data']['productList'][0]['list'][i].Add('template',1);
-          }
-        }
+        responseJSON.JSONObject['data']["show_welcome_page"] = 1;
+        responseJSON.JSONObject['data']["welcome_page"] = "ifanli://m.51fanli.com/app/show/web?url=http%3a%2f%2fm.fanli.com%2ftaobao%2fmvp";
         var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
         oSession.utilSetResponseBody(responseStringDestinal);
       }
+
+      // if (oSession.fullUrl.Contains("api.fanli.com/app/v1/mapp.htm")) {
+      //   FiddlerObject.log('enter custom');
+      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
+      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+      //   var productList = responseJSON.JSONObject['data']['productList'][0]['list'];
+        // for(var i=0;i<productList.Count;i++){
+        //   if(!responseJSON.JSONObject['data']['productList'][0]['list'][i].ContainsKey('template')){
+        //     responseJSON.JSONObject['data']['productList'][0]['list'][i].Add('template',1);
+        //   }
+        // }
+        // var brandlist = responseJSON.JSONObject['data']['brandList'][3]['list'];
+        // for(var i=0;i<brandlist.Count;i++){
+        //   if(responseJSON.JSONObject['data']['brandList'][3]['list'][i].ContainsKey('style')){
+        //     responseJSON.JSONObject['data']['brandList'][3]['list'][i].Remove('style');
+        //   }
+        //   responseJSON.JSONObject['data']['brandList'][3]['list'][i].Add('style',1);
+        // }
+      //   var product = responseJSON.JSONObject['data']['productList'][0]['list'][0];
+      //   for(var i=0;i<2000;i++){
+      //     responseJSON.JSONObject['data']['productList'][0]['list'].Add(product);
+      //   }
+      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+      //   oSession.utilSetResponseBody(responseStringDestinal);
+      // }
+
     }
 
     // 保存response到本地
@@ -1007,6 +1038,7 @@ class Handlers {
         catch(err){
             }
       }*/
+
   }
 
   /*
@@ -1026,7 +1058,7 @@ class Handlers {
   */
 
       static function OnBoot() {
-          getMcData();
+
           // MessageBox.Show("Fiddler has finished booting");
           // System.Diagnostics.Process.Start("iexplore.exe");
           //
