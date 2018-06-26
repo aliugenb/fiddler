@@ -510,52 +510,117 @@ class Handlers {
     return str.replace(/(\s*$)/g, "");
   }
 
+  static function getCustomResponseJSON(host,path,header,method){
+    var headers: HTTPRequestHeaders = new HTTPRequestHeaders(path, [host, header]);
+    headers.HTTPMethod = method;
+    var session = FiddlerApplication.oProxy.SendRequestAndWait(headers, null, null, null);
+    var responseJSON = null;
+    if (200==session.responseCode){
+      var responseStringOriginal = session.GetResponseBodyAsString();
+      responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+    }else {
+      return false;
+    }
+    return responseJSON;
+  }
+
   public static var m_abtest: String = null;
-  static function getAbtest(abtest, type) {
+  static function getTestId(abtest, type){
     var parts = abtest.split("-");
     if (null == parts) {
       MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
       return;
     }
-    var abtests = new Array();
-    var path = '/route?api=appAbtest.getTestInfoByStoryid&storyid=';
+    var testids = new Array();
     for (var idx = 0; idx < parts.length; idx++) {
       var testGroup = parts[idx].split("_");
       if (null == testGroup || testGroup.length != 2) {
         MessageBox.Show("格式有问题，请输入如18560_b-18990_c格式！");
         return;
       }
-      var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path+"&type="+type+"&bid="+testGroup[0], ['Host: gw.api.fanli.com', 'custom_abtest: '+testGroup[0]]);
-      abtest_headers.HTTPMethod = "GET";
-      var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);
-      if (200 == abtest_session.responseCode) {
-        var responseStringOriginal = abtest_session.GetResponseBodyAsString();
-        var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-        if (abtest_session.utilFindInResponse("id", false) > -1) {
-          testGroup[0] = responseJSON.JSONObject['data']['id'];
+      //自定义的type类型，直接输入testid
+      if (type == 8){
+        testids.push({'testid': testGroup[0],'group': testGroup[1]});
+      }else {
+        // var host = 'Host: gw.api.fanli.com';
+        // var path = '/route?api=appAbtest.getTestIdByBusinessid'+"&type="+type+"&bid="+testGroup[0];
+        // var header = 'custom_abtest: '+testGroup[0];
+        // var responseJSON = getCustomResponseJSON(host,path,header,'GET');
+        // if (responseJSON){
+        //   if(responseJSON['data']>0){
+        //     var testid = responseJSON['data'];
+        //     var testid_path = '/route?api=appAbtest.getTestInfoByTestid&testid='+testid;
+        //     var testid_header = 'custom_abtest: '+testid;
+        //     var testid_responseJSON = getCustomResponseJSON(host,testid_path,testid_header,'GET');
+        //     if (testid_responseJSON){
+        //       var now = Math.round(new Date().getTime()/1000);
+        //       if (testid_responseJSON['data']['status']==1 && now>testid_responseJSON['data']['starttime'] && now<testid_responseJSON['data']['endtime']){
+        //         testGroup[0] = testid;
+        //       }else {
+        //         MessageBox.Show(testGroup[0] + "未开始或者已过期");
+        //         return;
+        //       }
+        //     }else {
+        //       MessageBox.Show(testGroup[0] + "内部查询testid有效期接口报错");
+        //       return;
+        //     }
+        //   }
+        // }else {
+        //   MessageBox.Show(testGroup[0] + "内部查询testid接口报错");
+        //   return;
+        // }
+        var path = '/route?api=appAbtest.getTestIdByBusinessid'+"&type="+type+"&bid="+testGroup[0];
+        var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path, ['Host: gw.api.fanli.com', 'custom_abtest: '+testGroup[0]]);
+        abtest_headers.HTTPMethod = "GET";
+        var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);
+        if (200 == abtest_session.responseCode) {
+          var responseStringOriginal = abtest_session.GetResponseBodyAsString();
+          var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+          if (responseJSON.JSONObject['data']>0){
+            var testid = responseJSON.JSONObject['data'];
+            var test_path = '/route?api=appAbtest.getTestInfoByTestid&testid='+testid;
+            var testid_headers: HTTPRequestHeaders = new HTTPRequestHeaders(test_path, ['Host: gw.api.fanli.com', 'custom_abtest: '+testGroup[0]]);
+            testid_headers.HTTPMethod = "GET";
+            var testid_session = FiddlerApplication.oProxy.SendRequestAndWait(testid_headers, null, null, null);
+            if (200 == testid_session.responseCode){
+              var testid_responseStringOriginal = testid_session.GetResponseBodyAsString();
+              var testid_responseJSON = Fiddler.WebFormats.JSON.JsonDecode(testid_responseStringOriginal);
+              var now = Math.round(new Date().getTime()/1000);
+              if (testid_responseJSON.JSONObject['data']['status']==1 && now>testid_responseJSON.JSONObject['data']['starttime'] && now<testid_responseJSON.JSONObject['data']['endtime']){
+                testGroup[0] = testid;
+              }else {
+                MessageBox.Show(testGroup[0] + "未开始或者已过期");
+                return;
+              }
+            }else {
+              MessageBox.Show(testGroup[0] + "内部查询testid有效期接口报错");
+              return;
+            }
+          }else {
+            MessageBox.Show(testGroup[0] + "没有对应的testid");
+            return;
+          }
         } else {
-          MessageBox.Show(testGroup[0] + "没有对应的testid");
+          MessageBox.Show(testGroup[0] + "内部查询testid接口报错");
           return;
         }
-      } else {
-        MessageBox.Show(testGroup[0] + "内部gw接口调用错误");
-        return;
+        testids.push({'testid': testGroup[0],'group': testGroup[1]});
       }
-      abtests.push({
-        'testid': testGroup[0],
-        'group': testGroup[1]
-      });
     }
-    abtests.sort(function(a, b) {
+    return testids;
+  }
+
+  static function getAbtest(testids) {
+    testids.sort(function(a, b) {
       return a.testid - b.testid;
     });
-    var abtests2 = new Array();
+    var abtests = new Array();
     var testId = 0;
-    for (var idx = 0; idx < abtests.length; idx++) {
-      abtests2.push((abtests[idx].testid - testId) + "_" + abtests[idx].group);
-      testId = abtests[idx].testid;
+    for (var idx = 0; idx < testids.length; idx++) {
+      abtests.push((testids[idx].testid - testId) + "_" + testids[idx].group);
+      testId = testids[idx].testid;
     }
-    var result = abtests2.join("-");
+    var result = abtests.join("-");
     //abtest 29210_b-21395_c-19260_b-26654_b
     //结果进行md5
     var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
@@ -1133,15 +1198,36 @@ class Handlers {
     var sAction = sParams[0].toLowerCase();
     switch (sAction) {
       case "abtest":
-        if (sParams.length==3 && sParams[2]){
-          m_abtest = getAbtest(sParams[1], sParams[2]);
-        }else if (sParams.length==2) {
-          m_abtest = getAbtest(sParams[1], 1);
-        }else {
+        if (sParams.Length < 2) {
           m_abtest = null;
           FiddlerObject.StatusText = "abtest cleared";
           return false;
         }
+        var abtests = new System.Collections.HashSet();
+        abtests.push(1);
+        abtests.push(1);
+        FiddlerObject.log(abtests);
+        // var abtests = new HashSet();
+        // var inputs = new System.Collections.Generic.HashSet();//保存所有输入的数据
+        // var types = new System.Collections.Generic.HashSet();//保存所有输入的type
+        // for (var i=1 ; i<sParams.length ; i++){
+        //   var input_abtest = sParams[i].split(':');
+        //   var input = {};
+        //   input.abtests = input_abtest[0];
+        //   if (input_abtest.length==1){
+        //     input.type = 1;
+        //     types.add(1)
+        //   }else {
+        //     input.type = input_abtest[1];
+        //     types.add(input_abtest[1]);
+        //   }
+        //   inputs.add(input);
+        // }
+        // for (var input in inpus){
+        //   for (var type in types){
+        //     FiddlerObject.StatusText = "abtest参数 " + sParams[1];
+        //   }
+        // }
         FiddlerObject.StatusText = "abtest参数 " + sParams[1];
         return true;
       case "bold":
