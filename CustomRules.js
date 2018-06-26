@@ -653,6 +653,22 @@ class Handlers {
     return false;
   }
 
+  static function removeDuplicate(arr){
+    FiddlerObject.log(333);
+    var result = new Array();
+    FiddlerObject.log(4444);
+    result.push(arr[0]);
+    FiddlerObject.log(5555);
+    for(var i = 1; i < arr.length; i++) {
+      if (arr.indexOf(arr[i]) == i) {
+        FiddlerObject.log(7777);
+        result.push(arr[i])
+      }
+    }
+    FiddlerObject.log(6666);
+    return result;
+  }
+
   static function findInRequestUrl(url, arr) {
     var i = arr.length;
     while (i--) {
@@ -735,6 +751,9 @@ class Handlers {
     if (null != m_host && (oSession.host.Contains("fanli") || oSession.host.Contains("shzyfl"))) {
       var path = "Hosts\\" + m_host + ".hosts";
       var hosts = GetHosts(path);
+      if (hosts==null){
+        return;
+      }
       var original_ip = oSession.m_hostIP;
       // oSession.bypassGateway = true;
       if (!oSession.host.Contains('app.office.fanli.com')) {
@@ -1044,15 +1063,15 @@ class Handlers {
       //   oSession.utilSetResponseBody(responseStringDestinal);
       // }
 
-      if(oSession.fullUrl.Contains("passport.fanli.com/mobileapi/v1/applogin/loginReg?")){
-        FiddlerObject.log('enter custom');
-        var responseStringOriginal = oSession.GetResponseBodyAsString();
-        var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-        responseJSON.JSONObject['data']["show_welcome_page"] = 1;
-        responseJSON.JSONObject['data']["welcome_page"] = "ifanli://m.51fanli.com/app/show/web?url=http%3a%2f%2fm.fanli.com%2ftaobao%2fmvp";
-        var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
-        oSession.utilSetResponseBody(responseStringDestinal);
-      }
+      // if(oSession.fullUrl.Contains("passport.fanli.com/mobileapi/v1/applogin/loginReg?")){
+      //   FiddlerObject.log('enter custom');
+      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
+      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
+      //   responseJSON.JSONObject['data']["show_welcome_page"] = 1;
+      //   responseJSON.JSONObject['data']["welcome_page"] = "ifanli://m.51fanli.com/app/show/web?url=http%3a%2f%2fm.fanli.com%2ftaobao%2fmvp";
+      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
+      //   oSession.utilSetResponseBody(responseStringDestinal);
+      // }
 
       // if (oSession.fullUrl.Contains("api.fanli.com/app/v1/mapp.htm")) {
       //   FiddlerObject.log('enter custom');
@@ -1203,10 +1222,16 @@ class Handlers {
           FiddlerObject.StatusText = "abtest cleared";
           return false;
         }
-        var abtests = new System.Collections.HashSet();
-        abtests.push(1);
-        abtests.push(1);
-        FiddlerObject.log(abtests);
+        var a = new Array();
+        a.push(1);
+        a.push(2);
+        a.push(3);
+        a.push(4);
+        a.push(1);
+        a.push(2);
+        FiddlerObject.log(typeof(a));
+        var b = removeDuplicate(a);
+        FiddlerObject.log(b);
         // var abtests = new HashSet();
         // var inputs = new System.Collections.Generic.HashSet();//保存所有输入的数据
         // var types = new System.Collections.Generic.HashSet();//保存所有输入的type
