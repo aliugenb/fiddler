@@ -654,18 +654,17 @@ class Handlers {
   }
 
   static function removeDuplicate(arr){
-    FiddlerObject.log(333);
     var result = new Array();
-    FiddlerObject.log(4444);
-    result.push(arr[0]);
-    FiddlerObject.log(5555);
-    for(var i = 1; i < arr.length; i++) {
-      if (arr.indexOf(arr[i]) == i) {
-        FiddlerObject.log(7777);
-        result.push(arr[i])
+    var json = {};
+    for(var i = 0; i < arr.length; i++){
+      FiddlerObject.log(json[arr[i]]);
+      FiddlerObject.log('+++++++++++++++');
+      if(!json[arr[i]]){
+        result.push(arr[i]);
+        json[arr[i]] = 1;
       }
     }
-    FiddlerObject.log(6666);
+    FiddlerObject.log(json);
     return result;
   }
 
@@ -1072,32 +1071,6 @@ class Handlers {
       //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
       //   oSession.utilSetResponseBody(responseStringDestinal);
       // }
-
-      // if (oSession.fullUrl.Contains("api.fanli.com/app/v1/mapp.htm")) {
-      //   FiddlerObject.log('enter custom');
-      //   var responseStringOriginal = oSession.GetResponseBodyAsString();
-      //   var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-      //   var productList = responseJSON.JSONObject['data']['productList'][0]['list'];
-        // for(var i=0;i<productList.Count;i++){
-        //   if(!responseJSON.JSONObject['data']['productList'][0]['list'][i].ContainsKey('template')){
-        //     responseJSON.JSONObject['data']['productList'][0]['list'][i].Add('template',1);
-        //   }
-        // }
-        // var brandlist = responseJSON.JSONObject['data']['brandList'][3]['list'];
-        // for(var i=0;i<brandlist.Count;i++){
-        //   if(responseJSON.JSONObject['data']['brandList'][3]['list'][i].ContainsKey('style')){
-        //     responseJSON.JSONObject['data']['brandList'][3]['list'][i].Remove('style');
-        //   }
-        //   responseJSON.JSONObject['data']['brandList'][3]['list'][i].Add('style',1);
-        // }
-      //   var product = responseJSON.JSONObject['data']['productList'][0]['list'][0];
-      //   for(var i=0;i<2000;i++){
-      //     responseJSON.JSONObject['data']['productList'][0]['list'].Add(product);
-      //   }
-      //   var responseStringDestinal = Fiddler.WebFormats.JSON.JsonEncode(responseJSON.JSONObject);
-      //   oSession.utilSetResponseBody(responseStringDestinal);
-      // }
-
     }
 
     // 保存response到本地
@@ -1222,35 +1195,37 @@ class Handlers {
           FiddlerObject.StatusText = "abtest cleared";
           return false;
         }
-        var a = new Array();
-        a.push(1);
-        a.push(2);
-        a.push(3);
-        a.push(4);
-        a.push(1);
-        a.push(2);
-        FiddlerObject.log(typeof(a));
-        var b = removeDuplicate(a);
+        var a = [{'a':1,'b':3},{'c':1,'d':3},{'a':1,'b':3}];
+        var c = ['a','b','c','d','a','b','e','f'];
+        var b = removeDuplicate(c);
         FiddlerObject.log(b);
-        // var abtests = new HashSet();
-        // var inputs = new System.Collections.Generic.HashSet();//保存所有输入的数据
-        // var types = new System.Collections.Generic.HashSet();//保存所有输入的type
+        // var abtests = new Array();
+        // var inputs = new Array();//保存所有输入的数据
+        // var types = new Array();//保存所有输入的type
         // for (var i=1 ; i<sParams.length ; i++){
         //   var input_abtest = sParams[i].split(':');
         //   var input = {};
+        //   FiddlerObject.log(input_abtest);
         //   input.abtests = input_abtest[0];
-        //   if (input_abtest.length==1){
+        //   if (input_abtest.length==1 || input_abtest[1]==''){
         //     input.type = 1;
-        //     types.add(1)
+        //     types.push(1)
         //   }else {
         //     input.type = input_abtest[1];
-        //     types.add(input_abtest[1]);
+        //     types.push(input_abtest[1]);
         //   }
-        //   inputs.add(input);
+        //   inputs.push(input);
         // }
-        // for (var input in inpus){
+        // FiddlerObject.log(types);
+        // FiddlerObject.log('==========');
+        // types = removeDuplicate(types);
+        // FiddlerObject.log(types);
+        // // FiddlerObject.log(inputs);
+        // for (var input in inputs){
         //   for (var type in types){
-        //     FiddlerObject.StatusText = "abtest参数 " + sParams[1];
+        //     if (type==input.type){
+        //
+        //     }
         //   }
         // }
         FiddlerObject.StatusText = "abtest参数 " + sParams[1];
