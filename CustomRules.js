@@ -611,15 +611,22 @@ class Handlers {
   }
 
   static function getAbtest(testids) {
+    if (testids == null){
+      return;
+    }
     testids.sort(function(a, b) {
       return a.testid - b.testid;
     });
     var abtests = new Array();
     var testId = 0;
     for (var idx = 0; idx < testids.length; idx++) {
+      if (testids[idx]==null){
+        return;
+      }
       abtests.push((testids[idx].testid - testId) + "_" + testids[idx].group);
       testId = testids[idx].testid;
     }
+
     var result = abtests.join("-");
     //abtest 29210_b-21395_c-19260_b-26654_b
     //结果进行md5
@@ -657,14 +664,11 @@ class Handlers {
     var result = new Array();
     var json = {};
     for(var i = 0; i < arr.length; i++){
-      FiddlerObject.log(json[arr[i]]);
-      FiddlerObject.log('+++++++++++++++');
       if(!json[arr[i]]){
         result.push(arr[i]);
         json[arr[i]] = 1;
       }
     }
-    FiddlerObject.log(json);
     return result;
   }
 
@@ -1195,40 +1199,56 @@ class Handlers {
           FiddlerObject.StatusText = "abtest cleared";
           return false;
         }
-        var a = [{'a':1,'b':3},{'c':1,'d':3},{'a':1,'b':3}];
-        var c = ['a','b','c','d','a','b','e','f'];
-        var b = removeDuplicate(c);
-        FiddlerObject.log(b);
-        // var abtests = new Array();
-        // var inputs = new Array();//保存所有输入的数据
-        // var types = new Array();//保存所有输入的type
-        // for (var i=1 ; i<sParams.length ; i++){
-        //   var input_abtest = sParams[i].split(':');
-        //   var input = {};
-        //   FiddlerObject.log(input_abtest);
-        //   input.abtests = input_abtest[0];
-        //   if (input_abtest.length==1 || input_abtest[1]==''){
-        //     input.type = 1;
-        //     types.push(1)
-        //   }else {
-        //     input.type = input_abtest[1];
-        //     types.push(input_abtest[1]);
-        //   }
-        //   inputs.push(input);
+        // var a = [{'a':1,'b':3},{'c':1,'d':3},{'a':1,'b':3}];
+        // var c = ['a','b','c','d','a','b','e','f'];
+        // var d = new Array();
+        // d.push(11);
+        // d.push(33);
+        // FiddlerObject.log(c.concat(d));
+        // var b = new System.Text.StringBuilder();
+        // var b:String = null;
+        // for (var i=0;i<c.length;i++ ){
+        //   b = b+c[i]+'-';
         // }
-        // FiddlerObject.log(types);
-        // FiddlerObject.log('==========');
-        // types = removeDuplicate(types);
-        // FiddlerObject.log(types);
-        // // FiddlerObject.log(inputs);
-        // for (var input in inputs){
-        //   for (var type in types){
-        //     if (type==input.type){
-        //
-        //     }
-        //   }
-        // }
-        FiddlerObject.StatusText = "abtest参数 " + sParams[1];
+
+        // var b = removeDuplicate(c);
+        // FiddlerObject.log(b.substr(0,b.length-1));
+
+        // abtest 23213_a-3213_b:3 423432_c-6599_b:2 4324_a 3123555_c 42344_d:3
+        var tip = new System.Text.StringBuilder();
+        var inputs = new Array();//保存所有输入的数据
+        var types = new Array();//保存所有输入的type
+        for (var i=1 ; i<sParams.length ; i++){
+          tip.Append(sParams[i]+' ');
+          var input_abtest = sParams[i].split(':');
+          var input = {};
+          input.abtests = input_abtest[0];
+          if (input_abtest.length==1 || input_abtest[1]==''){
+            input.type = 1;
+            types.push(1)
+          }else {
+            input.type = input_abtest[1];
+            types.push(input_abtest[1]);
+          }
+          inputs.push(input);
+        }
+        types = removeDuplicate(types);
+
+        var abtests = new Array();
+        var testids = new Array();
+        for (var i=0;i<types.length;i++){
+          var abtest_tmp = new System.Text.StringBuilder();
+          for (var j=0;j<inputs.length;j++){
+            if (types[i]==inputs[j].type){
+              abtest_tmp.Append(inputs[j].abtests+'-');
+            }
+          }
+          var abtest = abtest_tmp.ToString();
+          abtests = getTestId(abtest.substr(0,abtest.length-1), types[i]);
+          testids = testids.concat(abtests);
+        }
+        m_abtest = getAbtest(testids);
+        FiddlerObject.StatusText = "abtest参数 " + tip.ToString();
         return true;
       case "bold":
         if (sParams.Length < 2) {
