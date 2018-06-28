@@ -1086,14 +1086,14 @@ class Handlers {
       }
   */
 
-      static function OnBoot() {
-
-          // MessageBox.Show("Fiddler has finished booting");
-          // System.Diagnostics.Process.Start("iexplore.exe");
-          //
-          // UI.ActivateRequestInspector("HEADERS");
-          // UI.ActivateResponseInspector("HEADERS");
-      }
+      // static function OnBoot() {
+      //
+      //     MessageBox.Show("Fiddler has finished booting");
+      //     System.Diagnostics.Process.Start("iexplore.exe");
+      //
+      //     UI.ActivateRequestInspector("HEADERS");
+      //     UI.ActivateResponseInspector("HEADERS");
+      // }
 
   /*
   static function OnBeforeShutdown(): Boolean {
@@ -1167,21 +1167,6 @@ class Handlers {
           FiddlerObject.StatusText = "abtest cleared";
           return false;
         }
-        // var a = [{'a':1,'b':3},{'c':1,'d':3},{'a':1,'b':3}];
-        // var c = ['a','b','c','d','a','b','e','f'];
-        // var d = new Array();
-        // d.push(11);
-        // d.push(33);
-        // FiddlerObject.log(c.concat(d));
-        // var b = new System.Text.StringBuilder();
-        // var b:String = null;
-        // for (var i=0;i<c.length;i++ ){
-        //   b = b+c[i]+'-';
-        // }
-
-        // var b = removeDuplicate(c);
-        // FiddlerObject.log(b.substr(0,b.length-1));
-
         // abtest 23213_a-3213_b:3 423432_c-6599_b:2 4324_a 3123555_c 42344_d:3
         var tip = new System.Text.StringBuilder();
         var inputs = new Array();//保存所有输入的数据
@@ -1201,7 +1186,6 @@ class Handlers {
           inputs.push(input);
         }
         types = removeDuplicate(types);
-
         var abtests = new Array();
         var testids = new Array();
         for (var i=0;i<types.length;i++){
