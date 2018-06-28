@@ -521,7 +521,7 @@ class Handlers {
     }else {
       return false;
     }
-    return responseJSON;
+    return responseJSON.JSONObject;
   }
 
   public static var m_abtest: String = null;
@@ -539,54 +539,22 @@ class Handlers {
         return;
       }
       //自定义的type类型，直接输入testid
-      if (type == 8){
+      if (type == 88){
         testids.push({'testid': testGroup[0],'group': testGroup[1]});
       }else {
-        // var host = 'Host: gw.api.fanli.com';
-        // var path = '/route?api=appAbtest.getTestIdByBusinessid'+"&type="+type+"&bid="+testGroup[0];
-        // var header = 'custom_abtest: '+testGroup[0];
-        // var responseJSON = getCustomResponseJSON(host,path,header,'GET');
-        // if (responseJSON){
-        //   if(responseJSON['data']>0){
-        //     var testid = responseJSON['data'];
-        //     var testid_path = '/route?api=appAbtest.getTestInfoByTestid&testid='+testid;
-        //     var testid_header = 'custom_abtest: '+testid;
-        //     var testid_responseJSON = getCustomResponseJSON(host,testid_path,testid_header,'GET');
-        //     if (testid_responseJSON){
-        //       var now = Math.round(new Date().getTime()/1000);
-        //       if (testid_responseJSON['data']['status']==1 && now>testid_responseJSON['data']['starttime'] && now<testid_responseJSON['data']['endtime']){
-        //         testGroup[0] = testid;
-        //       }else {
-        //         MessageBox.Show(testGroup[0] + "未开始或者已过期");
-        //         return;
-        //       }
-        //     }else {
-        //       MessageBox.Show(testGroup[0] + "内部查询testid有效期接口报错");
-        //       return;
-        //     }
-        //   }
-        // }else {
-        //   MessageBox.Show(testGroup[0] + "内部查询testid接口报错");
-        //   return;
-        // }
+        var host = 'Host: gw.api.fanli.com';
         var path = '/route?api=appAbtest.getTestIdByBusinessid'+"&type="+type+"&bid="+testGroup[0];
-        var abtest_headers: HTTPRequestHeaders = new HTTPRequestHeaders(path, ['Host: gw.api.fanli.com', 'custom_abtest: '+testGroup[0]]);
-        abtest_headers.HTTPMethod = "GET";
-        var abtest_session = FiddlerApplication.oProxy.SendRequestAndWait(abtest_headers, null, null, null);
-        if (200 == abtest_session.responseCode) {
-          var responseStringOriginal = abtest_session.GetResponseBodyAsString();
-          var responseJSON = Fiddler.WebFormats.JSON.JsonDecode(responseStringOriginal);
-          if (responseJSON.JSONObject['data']>0){
-            var testid = responseJSON.JSONObject['data'];
-            var test_path = '/route?api=appAbtest.getTestInfoByTestid&testid='+testid;
-            var testid_headers: HTTPRequestHeaders = new HTTPRequestHeaders(test_path, ['Host: gw.api.fanli.com', 'custom_abtest: '+testGroup[0]]);
-            testid_headers.HTTPMethod = "GET";
-            var testid_session = FiddlerApplication.oProxy.SendRequestAndWait(testid_headers, null, null, null);
-            if (200 == testid_session.responseCode){
-              var testid_responseStringOriginal = testid_session.GetResponseBodyAsString();
-              var testid_responseJSON = Fiddler.WebFormats.JSON.JsonDecode(testid_responseStringOriginal);
+        var header = 'custom_abtest: '+testGroup[0];
+        var responseJSON = getCustomResponseJSON(host,path,header,'GET');
+        if (responseJSON){
+          if(responseJSON['data']>0){
+            var testid = responseJSON['data'];
+            var testid_path = '/route?api=appAbtest.getTestInfoByTestid&testid='+testid;
+            var testid_header = 'custom_abtest: '+testid;
+            var testid_responseJSON = getCustomResponseJSON(host,testid_path,testid_header,'GET');
+            if (testid_responseJSON){
               var now = Math.round(new Date().getTime()/1000);
-              if (testid_responseJSON.JSONObject['data']['status']==1 && now>testid_responseJSON.JSONObject['data']['starttime'] && now<testid_responseJSON.JSONObject['data']['endtime']){
+              if (testid_responseJSON['data']['status']==1 && now>testid_responseJSON['data']['starttime'] && now<testid_responseJSON['data']['endtime']){
                 testGroup[0] = testid;
               }else {
                 MessageBox.Show(testGroup[0] + "未开始或者已过期");
@@ -600,7 +568,7 @@ class Handlers {
             MessageBox.Show(testGroup[0] + "没有对应的testid");
             return;
           }
-        } else {
+        }else {
           MessageBox.Show(testGroup[0] + "内部查询testid接口报错");
           return;
         }
@@ -641,6 +609,18 @@ class Handlers {
     return abtest_result.toLowerCase();
   }
 
+  static function removeDuplicate(arr){
+    var result = new Array();
+    var json = {};
+    for(var i = 0; i < arr.length; i++){
+      if(!json[arr[i]]){
+        result.push(arr[i]);
+        json[arr[i]] = 1;
+      }
+    }
+    return result;
+  }
+
   //图片hosts
   public static var image_hosts = new Array("l0.51fanli.net", "l1.51fanli.net", "l2.51fanli.net", "l3.51fanli.net", "l4.51fanli.net", "i0.51fanli.net", "i1.51fanli.net", "i2.51fanli.net", "i3.51fanli.net", "i4.51fanli.net");
 
@@ -658,18 +638,6 @@ class Handlers {
       }
     }
     return false;
-  }
-
-  static function removeDuplicate(arr){
-    var result = new Array();
-    var json = {};
-    for(var i = 0; i < arr.length; i++){
-      if(!json[arr[i]]){
-        result.push(arr[i]);
-        json[arr[i]] = 1;
-      }
-    }
-    return result;
   }
 
   static function findInRequestUrl(url, arr) {
