@@ -704,11 +704,6 @@ class Handlers {
       }
     }
 
-    if(oSession.fullUrl.Contains("api.fanli.com/app/v2/protocol/dys.htm")){
-      var ip = "10.0.5.202";
-      oSession["x-overrideHostname"] = ip;
-    }
-
     // Sample Rule: Flag POSTs to fiddler2.com in italics
     // if (oSession.HostnameIs("www.fiddler2.com") && oSession.HTTPMethodIs("POST")) {	oSession["ui-italic"] = "yup";	}
 
