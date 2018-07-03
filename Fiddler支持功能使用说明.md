@@ -40,8 +40,9 @@ git pull {自定义别名} master<br>
 ### 二、自定义abtest参数
 #### 使用方法：
 1. Fiddler命令行输入:`abtest 24450_b-22312_b-39103_b:{type}`<br>
-type值：1.需求分流/2.首页开机画面分流/3.弹层分流/4.首页入口/5.滚动图(banner)分流/6.运营广告位分流，<a href="http://192.168.100.87/APP_ABTEST_API:getTestIdByBusinessid" target="_blank">具体type值可点击查看Wiki</a>，另外新增type88.直接输入testid<br>
+type值：1.需求分流/2.首页开机画面分流/3.弹层分流/4.首页入口/5.滚动图(banner)分流/6.运营广告位分流，<a href="http://192.168.100.87/APP_ABTEST_API:getTestIdByBusinessid" target="_blank">具体type值可点击查看Wiki</a><br>
 支持多种类型的分流，如abtest 24450_b-42819_c:1 22312_b:2 39103_b:88，不同type直接空格隔开<br>
+如果是需求类型，可以不加type值：abtest 24450_b；如果已知testid，type使用88，输入abtest 62513_b:88即可<br>
 <img src="https://github.com/aliugenb/Temp/raw/master/MarkdownPictures/abtest/abtest.png" width="284" height="54"  />
 
 2. 输入后请求gw.appAbtest.getTestInfoByStoryid接口
