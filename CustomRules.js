@@ -138,7 +138,6 @@ class Handlers {
   RulesStringValue(3, "生产", "shengchan")
   RulesStringValue(4, "custom外测", "custom-waice")
   RulesStringValue(5, "custom内测", "custom-neice")
-  BindPref("fiddlerscript.rules.m_host")
   public static var m_host: String = null;
 
   public static RulesOption("图片是否绑定生产", "SwitchHosts")
